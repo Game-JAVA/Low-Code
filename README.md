@@ -1,6 +1,11 @@
-# Game Classes
+# Game-JAVA 📜
+This repository is a teaching project developed during the Internship at the Systems Analysis and Development faculty.
 
-```mermaid
+
+
+# Game Class Diagram
+
+```
 
 ---
 title: UML Diagram
