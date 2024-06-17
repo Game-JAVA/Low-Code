@@ -1,7 +1,11 @@
 # Game-JAVA 📜
 This repository is a teaching project developed during the Internship at the Systems Analysis and Development faculty.
 
+## Description
 
+The PACMAN game takes place through a maze, with the objective of eating all the lozenges and super lozenges scattered along the way. The player must avoid being captured by the ghosts that patrol the maze. When colliding with a tablet, PACMAN consumes it and it disappears from the maze. If the player manages to eat all the gum, he wins the game.
+
+The development of this game was done in JavaFX.
 
 # Game Class Diagram
 
