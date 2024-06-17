@@ -1,7 +1,7 @@
 # Game-JAVA 📜
 This repository is a teaching project developed during the Internship at the Systems Analysis and Development faculty.
 
-## Description
+## 📖 Description
 
 The PACMAN game takes place through a maze, with the objective of eating all the lozenges and super lozenges scattered along the way. The player must avoid being captured by the ghosts that patrol the maze. When colliding with a tablet, PACMAN consumes it and it disappears from the maze. If the player manages to eat all the gum, he wins the game.
 
@@ -35,9 +35,22 @@ The development of this game was done in JavaFX.
 ## 💻 Requirements
 * Java IDE or Compiler required to run the game.
 
+## 📥 Installation
+To install the game you must have the JAVA Project Execution Software on your computer, the recommended software is
+[🧷JetBrains IntelliJ IDEA Community Edition 2024.1.3](https://www.jetbrains.com/idea/download/?section=windows), which is what we used to develop the game.
+
+After installing the software, the next step is to clone our project. To do this, follow this step by step:
+ > Click: "<> Code" > HTTPS > Copy url to clipboard.
+
+ > Open IntelliJ IDEA.
+ 
+ > Click: Projects > Get from VCS > Repository URL > Git(Version Control) > Paste the url in "URL:" > Select the local directory in "Directory" > Clone.
+
+#
+
 # Game Class Diagram
 
-```
+```mermaid
 
 ---
 title: UML Diagram
