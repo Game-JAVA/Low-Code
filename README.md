@@ -7,6 +7,13 @@ The PACMAN game takes place through a maze, with the objective of eating all the
 
 The development of this game was done in JavaFX.
 
+## 🕹️ Controls
+* W-A-S-D or arrow keys to move the character.
+* Press 'ESC' to pause the game.
+
+## 💻 Requirements
+* Java IDE or Compiler required to run the game.
+
 # Game Class Diagram
 
 ```
