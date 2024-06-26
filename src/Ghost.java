@@ -1,28 +1,44 @@
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
 
 public class Ghost extends Character {
-    private Color color;
 
-    public Ghost(int x, int y, int tileSize, Color color) {
+    // Attributes
+    private Image image;
+    private String direction;
+    private long lastMoveTime;
+    private long moveInterval; // Intervalo de movimento em milissegundos
+
+    // Constructor
+    public Ghost(int x, int y, int tileSize, Image image) {
         super(x, y, tileSize);
-        this.color = color;
+        this.image = image;
+        this.direction = "Right"; // Direção inicial
+        this.moveInterval = 200; // Intervalo de movimento em milissegundos
+        this.lastMoveTime = System.currentTimeMillis();
+    }
+
+    // Methods
+    @Override
+    public void draw(GraphicsContext gc) {
+        gc.drawImage(image, x * tileSize, y * tileSize, tileSize, tileSize);
     }
 
     @Override
-    public void draw(GraphicsContext gc) {
-        gc.setFill(color);
-        gc.fillOval(x * tileSize, y * tileSize, tileSize, tileSize);
+    public void move(int dx, int dy, MazeBlock[][] map) {
+
     }
 
-    public void moveTowards(int pacManX, int pacManY, MazeBlock[][] map) {
-        int dx = Integer.compare(pacManX, x);
-        int dy = Integer.compare(pacManY, y);
+    // Getters and Setters
+    public void setImage(Image image) {
+        this.image = image;
+    }
 
-        if (Math.random() > 0.5) {
-            move(dx, 0, map);
-        } else {
-            move(0, dy, map);
-        }
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    public void setMoveInterval(long moveInterval) {
+        this.moveInterval = moveInterval;
     }
 }
