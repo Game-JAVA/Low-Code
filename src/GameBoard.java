@@ -6,45 +6,62 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class GameBoard extends Application {
 
     // Attributes
-
-    private static final int TILE_SIZE = 64;
-    private static final int MAP_WIDTH = 15;
-    private static final int MAP_HEIGHT = 15;
-
-    private MazeBlock[][] map = new MazeBlock[MAP_HEIGHT][MAP_WIDTH];
     private PacMan pacMan;
-    //    private Ghost[] ghosts;
+    private Ghost[] ghosts;
     private int dx = 0;
     private int dy = 0;
 
     private int[][] mazeLayout = {
-            {19, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22},
-            {17, 16, 16, 16, 16, 24, 16, 16, 16, 16, 16, 16, 16, 16, 20},
-            {25, 24, 24, 24, 28, 0, 17, 16, 16, 16, 16, 16, 16, 16, 20},
-            {0,  0,  0,  0,  0,  0, 17, 16, 16, 16, 16, 16, 16, 16, 20},
-            {19, 18, 18, 18, 18, 18, 16, 16, 16, 16, 24, 24, 24, 24, 20},
-            {17, 16, 16, 16, 16, 16, 16, 16, 16, 20, 0,  0,  0,  0, 21},
-            {17, 16, 16, 16, 16, 16, 16, 16, 16, 20, 0,  0,  0,  0, 21},
-            {17, 16, 16, 16, 24, 16, 16, 16, 16, 20, 0,  0,  0,  0, 21},
-            {17, 16, 16, 20, 0,  17, 16, 16, 16, 16, 18, 18, 18, 18, 20},
-            {17, 24, 24, 28, 0,  25, 24, 24, 16, 16, 16, 16, 16, 16, 20},
-            {21, 0,  0,  0,  0,  0,  0,  0,  17, 16, 16, 16, 16, 16, 20},
-            {17, 18, 18, 22, 0,  19, 18, 18, 16, 16, 16, 16, 16, 16, 20},
-            {17, 16, 16, 20, 0,  17, 16, 16, 16, 16, 16, 16, 16, 16, 20},
-            {17, 16, 16, 20, 0,  17, 16, 16, 16, 16, 16, 16, 16, 16, 20},
-            {25, 24, 24, 24, 26, 24, 24, 24, 24, 24, 24, 24, 24, 24, 28}
+            {  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  0,  0,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5 },
+            {  5,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0,  5 },
+            { 10,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0, 10 },
+            {  5,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0,  5 },
+            {  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5 },
+            {  5,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  5 },
+            {  5,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  5 },
+            {  5,  5,  5,  5,  5, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5,  0,  0,  5,  5,  5,  5,  0,  0,  5,  5,  5,  5,  0,  0, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5,  5,  5,  5,  5,  5 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0, 20,  0,  0, 20,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0, 20,  0,  0, 20,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5,  0,  0, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,  0,  0, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0, 20,  0,  0,  0, 20, 20,  0,  0,  0, 20,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0, 20,  0, 20, 20, 20, 20, 20, 20,  0, 20,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            { 20, 20, 20, 20, 20, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 20, 20, 20,  0, 20, 20, 20, 20, 20, 20,  0, 20, 20, 20, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 20, 20, 20, 20, 20 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 0,  0,  0, 20,  0, 20,  1,  2,  3,  4, 20,  0, 20,  0,  0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 0,  0,  0, 20,  0,  0,  0,  0,  0,  0,  0,  0, 20,  0,  0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  0,  0, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,  0,  0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0, 20,  0,  0,  0,  0,  0,  0,  0,  0, 20,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0, 20,  0,  0,  0,  0,  0,  0,  0,  0, 20,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
+            {  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  0,  0,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5 },
+            {  5,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0,  5 },
+            {  5,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0,  5 },
+            { 10,  5,  5,  0,  0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  0,  0,  5,  5, 10 },
+            {  0,  0,  5,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  5,  0,  0 },
+            {  0,  0,  5,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  5,  0,  0 },
+            {  5,  5,  5,  5,  5, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5,  0,  0,  5,  5,  5,  5,  0,  0,  5,  5,  5,  5,  0,  0, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5,  5,  5,  5,  5,  5 },
+            {  5,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  5 },
+            {  5,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  5 },
+            {  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5 }
     };
 
-    private Image pacmanUp;
-    private Image pacmanDown;
-    private Image pacmanLeft;
+    private final int TILE_SIZE = 30;
+    private final int MAP_HEIGHT = mazeLayout.length;
+    private final int MAP_WIDTH = mazeLayout[0].length;
+
+    private MazeBlock[][] map = new MazeBlock[MAP_HEIGHT][MAP_WIDTH];
+
+    private Image pacmanRightUp;
     private Image pacmanRight;
+    private Image pacmanRightDown;
+    private Image pacmanLeftUp;
+    private Image pacmanLeft;
+    private Image pacmanLeftDown;
+
+    private Image staticGhostUp;
 
     @Override
     public void start(Stage primaryStage) {
@@ -82,10 +99,14 @@ public class GameBoard extends Application {
 
     // Incializando as imagens
     private void loadImages() {
-        pacmanUp = new Image("/assets/up.gif");
-        pacmanDown = new Image("/assets/down.gif");
-        pacmanLeft = new Image("/assets/left.gif");
-        pacmanRight = new Image("/assets/right.gif");
+        pacmanRightUp = new Image("/assets/pacman-Right-Up.gif");
+        pacmanRight = new Image("/assets/pacman-Right.gif");
+        pacmanRightDown = new Image("/assets/pacman-Right-Down.gif");
+        pacmanLeftUp = new Image("/assets/pacman-Left-Up.gif");
+        pacmanLeft = new Image("/assets/pacman-Left.gif");
+        pacmanLeftDown = new Image("/assets/pacman-Left-Down.gif");
+
+        staticGhostUp = new Image("/assets/staticGhostUp.gif");
     }
 
     // Inicializando mapa
@@ -99,13 +120,16 @@ public class GameBoard extends Application {
 
     // Inicializando personagens
     private void initializeCharacters() {
-        pacMan = new PacMan(1, 1, TILE_SIZE, pacmanRight);
-//         ghosts = new Ghost[] { new Ghost(14, 15, TILE_SIZE, Color.RED), new Ghost(13,
-//         15, TILE_SIZE, Color.PINK), new Ghost(14, 14, TILE_SIZE, Color.CYAN), new Ghost(13,
-//         14, TILE_SIZE, Color.ORANGE) };
+        pacMan = new PacMan(0, 0, TILE_SIZE, pacmanRight);
+        ghosts = new Ghost[] {
+                new Ghost(GameBoard.ghostsLocation(1, mazeLayout)[1], GameBoard.ghostsLocation(1, mazeLayout)[0], TILE_SIZE, staticGhostUp),
+                new Ghost(GameBoard.ghostsLocation(2, mazeLayout)[1], GameBoard.ghostsLocation(2, mazeLayout)[0], TILE_SIZE, staticGhostUp),
+                new Ghost(GameBoard.ghostsLocation(3, mazeLayout)[1], GameBoard.ghostsLocation(3, mazeLayout)[0], TILE_SIZE, staticGhostUp),
+                new Ghost(GameBoard.ghostsLocation(4, mazeLayout)[1], GameBoard.ghostsLocation(4, mazeLayout)[0], TILE_SIZE, staticGhostUp)
+        };
     }
 
-    // Desenhando mapa
+    // Desenhando
     private void drawMap(GraphicsContext gc) {
         for (int y = 0; y < MAP_HEIGHT; y++) {
             for (int x = 0; x < MAP_WIDTH; x++) {
@@ -117,42 +141,61 @@ public class GameBoard extends Application {
     // Desenhando personagens
     private void drawCharacters(GraphicsContext gc) {
         pacMan.draw(gc);
-//         for (Ghost ghost : ghosts) {
-//         ghost.draw(gc);
-//         }
+        for (int i = 0; i < ghosts.length; i++) {
+            ghosts[i].draw(gc);
+        }
     }
 
-
+    // Verificando teclas pressionadas pelo usuário
     private void handleKeyPressed(KeyEvent event) {
         switch (event.getCode()) {
             case W:
             case UP:
                 dx = 0;
                 dy = -1;
-                pacMan.setImage(pacmanUp);
+
+                if (pacMan.getDirection().equals("Right") || pacMan.getDirection().equals("Left-Down")) {
+                    pacMan.setImage(pacmanRightUp);
+                    pacMan.setDirection("Right-Up");
+                } else if (pacMan.getDirection().equals("Left") || pacMan.getDirection().equals("Right-Down")) {
+                    pacMan.setImage(pacmanLeftUp);
+                    pacMan.setDirection("Left-Up");
+                }
+
                 break;
             case S:
             case DOWN:
                 dx = 0;
                 dy = 1;
-                pacMan.setImage(pacmanDown);
+
+                if (pacMan.getDirection().equals("Right") || pacMan.getDirection().equals("Left-Up")) {
+                    pacMan.setImage(pacmanRightDown);
+                    pacMan.setDirection("Right-Down");
+                } else if (pacMan.getDirection().equals("Left") || pacMan.getDirection().equals("Right-Up")) {
+                    pacMan.setImage(pacmanLeftDown);
+                    pacMan.setDirection("Left-Down");
+                }
+
                 break;
             case A:
             case LEFT:
                 dx = -1;
                 dy = 0;
                 pacMan.setImage(pacmanLeft);
+                pacMan.setDirection("Left");
                 break;
             case D:
             case RIGHT:
                 dx = 1;
                 dy = 0;
                 pacMan.setImage(pacmanRight);
+                pacMan.setDirection("Right");
                 break;
             default:
                 break;
         }
     }
+
 
     private void handleKeyReleased(KeyEvent event) {
         dx = 0;
@@ -162,9 +205,24 @@ public class GameBoard extends Application {
     private void update() {
         pacMan.move(dx, dy, map);
         pacMan.collectPellet(map);
-//         for (Ghost ghost : ghosts) {
-//         ghost.moveTowards(pacMan.getX(), pacMan.getY(), map);
-//         }
+    }
+
+    // Obter a posição que os fantasmas devem estar
+    private static int[] ghostsLocation(int ghostNumber, int[][] mazeLayout) {
+        int[] result = new int[2]; // Array para armazenar a posição [i, j]
+
+        for (int i = 0; i < mazeLayout.length; i++) {
+            for (int j = 0; j < mazeLayout[0].length; j++) {
+                if (mazeLayout[i][j] == ghostNumber) {
+                    result[0] = i; // Armazena a posição Y
+                    result[1] = j; // Armazena a posição X
+                    return result; // Retorna a posição assim que encontra o fantasma
+                }
+            }
+        }
+
+        // Se o fantasma não for encontrado retorna [-1, -1] como uma posição inválida.
+        return new int[]{-1, -1};
     }
 
     public static void main(String[] args) {
