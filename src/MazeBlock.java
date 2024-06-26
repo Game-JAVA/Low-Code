@@ -32,7 +32,7 @@ public class MazeBlock {
         }
         gc.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
 
-        if (type == 16) {
+        if (type == 5) {
             gc.setFill(Color.WHITE);
             gc.fillOval(x * tileSize + tileSize / 4, y * tileSize + tileSize / 4, tileSize / 4, tileSize / 4);
         }
@@ -43,7 +43,7 @@ public class MazeBlock {
     }
 
     public boolean isPellet() {
-        return type == 16;
+        return type == 5;
     }
 
     // Getters and Setters
