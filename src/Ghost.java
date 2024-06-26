@@ -24,6 +24,11 @@ public class Ghost extends Character {
         gc.drawImage(image, x * tileSize, y * tileSize, tileSize, tileSize);
     }
 
+    @Override
+    public void move(int dx, int dy, MazeBlock[][] map) {
+
+    }
+
     // Getters and Setters
     public void setImage(Image image) {
         this.image = image;
