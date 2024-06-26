@@ -19,15 +19,7 @@ public abstract class Character {
 
     public abstract void draw(GraphicsContext gc);
 
-    public void move(int dx, int dy, MazeBlock[][] map) {
-        int newX = x + dx;
-        int newY = y + dy;
-
-        if (newX >= 0 && newX < map[0].length && newY >= 0 && newY < map.length && !map[newY][newX].isWall()) {
-            x = newX;
-            y = newY;
-        }
-    }
+    public abstract void move(int dx, int dy, MazeBlock[][] map);
 
     // Getters and Setters
 
