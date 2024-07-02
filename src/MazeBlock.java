@@ -1,5 +1,5 @@
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
 
 public class MazeBlock {
 
@@ -9,45 +9,45 @@ public class MazeBlock {
     private int x;
     private int y;
     private int tileSize;
+    private Image image;
 
     // Constructor
 
-    public MazeBlock(int type, int x, int y, int tileSize) {
+    public MazeBlock(int type, int x, int y, int tileSize, Image image) {
         this.type = type;
         this.x = x;
         this.y = y;
         this.tileSize = tileSize;
+        this.image = image;
     }
 
     // Methods
-
     public void draw(GraphicsContext gc) {
-        switch (type) {
-            case 0:
-                gc.setFill(Color.BLUE); // Wall
-                break;
-            default:
-                gc.setFill(Color.BLACK); // Empty space
-                break;
-        }
-        gc.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-
-        if (type == 5) {
-            gc.setFill(Color.WHITE);
-            gc.fillOval(x * tileSize + tileSize / 4, y * tileSize + tileSize / 4, tileSize / 4, tileSize / 4);
-        }
+        gc.drawImage(image, x * tileSize, y * tileSize, tileSize, tileSize);
     }
 
     public boolean isWall() {
-        return type == 0;
+        return type != 0 && type != 5 && type != 10;
     }
 
     public boolean isPellet() {
         return type == 5;
     }
 
+    public boolean isSuperPellet() {
+        return type == 10;
+    }
+
     // Getters and Setters
     public void setType(int type) {
         this.type = type;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
     }
 }
