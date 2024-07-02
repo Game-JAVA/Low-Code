@@ -8,6 +8,7 @@ public class PacMan extends Character {
     private String direction;
     private long lastMoveTime;
     private long moveInterval; // Intervalo de movimento em milissegundos
+    private Image Empty = new Image("/assets/maze/0-Empty.png");;
 
     // Constructor
     public PacMan(int x, int y, int tileSize, Image image) {
@@ -60,11 +61,24 @@ public class PacMan extends Character {
 
     public void collectPellet(MazeBlock[][] map) {
         if (map[y][x].isPellet()) {
-            map[y][x].setType(-1); // Limpar o pellet
+            map[y][x].setType(0); // Limpar o superPellet
+            map[y][x].setImage(Empty); // Limpar o superPellet
+        }
+    }
+
+
+    public void collectSuperPellet(MazeBlock[][] map) {
+        if (map[y][x].isSuperPellet()) {
+            map[y][x].setType(0); // Limpar o superPellet
+            map[y][x].setImage(Empty); // Limpar o superPellet
         }
     }
 
     // Getters and Setters
+    public Image getImage(){
+        return image;
+    }
+
     public void setImage(Image image) {
         this.image = image;
     }
