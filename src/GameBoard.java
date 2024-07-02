@@ -6,6 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class GameBoard extends Application {
@@ -17,35 +18,39 @@ public class GameBoard extends Application {
     private int dy = 0;
 
     private int[][] mazeLayout = {
-            {  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  0,  0,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5 },
-            {  5,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0,  5 },
-            { 10,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0, 10 },
-            {  5,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0,  5 },
-            {  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5 },
-            {  5,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  5 },
-            {  5,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  5 },
-            {  5,  5,  5,  5,  5, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5,  0,  0,  5,  5,  5,  5,  0,  0,  5,  5,  5,  5,  0,  0, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5,  5,  5,  5,  5,  5 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0, 20,  0,  0, 20,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0, 20,  0,  0, 20,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5,  0,  0, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,  0,  0, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0, 20,  0,  0,  0, 20, 20,  0,  0,  0, 20,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0, 20,  0, 20, 20, 20, 20, 20, 20,  0, 20,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            { 20, 20, 20, 20, 20, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 20, 20, 20,  0, 20, 20, 20, 20, 20, 20,  0, 20, 20, 20, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 20, 20, 20, 20, 20 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 0,  0,  0, 20,  0, 20,  1,  2,  3,  4, 20,  0, 20,  0,  0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 0,  0,  0, 20,  0,  0,  0,  0,  0,  0,  0,  0, 20,  0,  0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  0,  0, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20,  0,  0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0, 20,  0,  0,  0,  0,  0,  0,  0,  0, 20,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  0,  0,  0,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0, 20,  0,  0,  0,  0,  0,  0,  0,  0, 20,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  0,  0,  0 },
-            {  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  0,  0,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5 },
-            {  5,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0,  5 },
-            {  5,  0,  0,  0,  0, 5, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 5,  0,  0,  0,  0,  5 },
-            { 10,  5,  5,  0,  0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  0,  0,  5,  5, 10 },
-            {  0,  0,  5,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  5,  0,  0 },
-            {  0,  0,  5,  0,  0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5,  0,  0,  5,  0,  0,  0,  0,  0,  0,  0,  0,  5,  0,  0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5,  0,  0,  5,  0,  0 },
-            {  5,  5,  5,  5,  5, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5,  0,  0,  5,  5,  5,  5,  0,  0,  5,  5,  5,  5,  0,  0, 5, 5, 5, 5, 0, 0, 5, 5, 5, 5, 0, 0, 5,  5,  5,  5,  5,  5 },
-            {  5,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  5 },
-            {  5,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0,  0,  0,  0,  0,  0,  5,  0,  0,  5,  0,  0,  0,  0,  0, 0, 0, 0, 5, 0, 0, 5, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  5 },
-            {  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5,  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,  5,  5,  5,  5,  5 }
+            { 61,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  62 },
+            { 60,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  60 },
+            { 60,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  60 },
+            { 60,  32,   5,  11,  42,  42,  12,   5,  11,  42,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  42,  12,   5,  11,  42,  42,  12,   5,  31,  60 },
+            { 60,  32,  10,  31,  60,  60,  32,   5,  31,  60,  60,  60,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  60,  60,  60,  32,   5,  31,  60,  60,  32,  10,  31,  60 },
+            { 60,  32,   5,  21,  41,  41,  22,   5,  21,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  22,   5,  21,  41,  41,  22,   5,  31,  60 },
+            { 60,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  60 },
+            { 60,  32,   5,  11,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  12,   5,  31,  60 },
+            { 60,  32,   5,  21,  41,  41,  22,   5,  31,  32,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  31,  32,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  31,  32,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  31,  32,   5,  21,  41,  41,  22,   5,  31,  60 },
+            { 60,  32,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,  31,  60 },
+            { 60,  52,  42,  42,  42,  42,  12,   5,  31,  32,   5,  11,  12,   5,  31,  32,   5,  11,  42,  42,  51,  52,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  51,  52,  42,  42,  12,   5,  31,  32,   5,  11,  12,   5,  31,  32,   5,  11,  42,  42,  42,  42,  51,  60 },
+            { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  32,   5,  21,  22,   5,  21,  41,  41,  53,  54,  41,  41,  22,   0,  21,  22,   0,  21,  41,  41,  53,  54,  41,  41,  22,   5,  21,  22,   5,  31,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
+            { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,  31,  32,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  31,  32,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
+            { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  32,   5,  11,  42,  42,  42,  12,   5,  31,  32,   0,  81,  91,  95, 100, 100,  96,  91,  82,   0,  31,  32,   5,  11,  42,  42,  42,  12,   5,  31,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
+            { 41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  22,   5,  31,  54,  41,  41,  22,   5,  21,  22,   0,  93,   0,   0,   0,   0,   0,   0,  94,   0,  21,  22,   5,  21,  41,  41,  53,  32,   5,  21,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41 },
+            { 70,   0,   0,   0,   0,   0,   0,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   0,   0,  93,   0,   0,   0,   0,   0,   0,  94,   0,   0,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   0,   0,   0,   0,   0,   0,  70 },
+            { 42,  42,  42,  42,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  51,  32,   5,  11,  42,  42,  42,  12,   0,  93,   0,   1,   2,   3,   4,   0,  94,   0,  11,  42,  42,  42,  12,   5,  31,  52,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  42,  42,  42,  42 },
+            { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  21,  41,  41,  41,  22,   5,  21,  41,  41,  53,  32,   0,  83,  92,  92,  92,  92,  92,  92,  84,   0,  31,  54,  41,  41,  22,   5,  21,  41,  41,  41,  22,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
+            { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
+            { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  31,  32,   0,  11,  42,  42,  42,  42,  42,  42,  12,   0,  31,  32,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
+            { 60,  54,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  53,  60 },
+            { 60,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  60 },
+            { 60,  32,   5,  11,  42,  42,  12,   5,  11,  42,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  42,  12,   5,  11,  42,  42,  12,   5,  31,  60 },
+            { 60,  32,   5,  21,  41,  53,  32,   5,  21,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  22,   5,  31,  54,  41,  22,   5,  31,  60 },
+            { 60,  32,  10,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,  10,  31,  60 },
+            { 60,  52,  42,  12,   5,  31,  32,   5,  11,  12,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  42,  42,  42,  42,  12,   5,  11,  12,   5,  31,  32,   5,  11,  42,  51,  60 },
+            { 60,  54,  41,  22,   5,  21,  22,   5,  31,  32,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  31,  32,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  31,  32,   5,  21,  41,  41,  53,  54,  41,  41,  22,   5,  31,  32,   5,  21,  22,   5,  21,  41,  53,  60 },
+            { 60,  32,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,  31,  60 },
+            { 60,  32,   5,  11,  42,  42,  42,  42,  51,  52,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  51,  52,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  51,  52,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  51,  52,  42,  42,  42,  42,  12,   5,  31,  60 },
+            { 60,  32,   5,  21,  41,  41,  41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41,  41,  41,  22,   5,  31,  60 },
+            { 60,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  60 },
+            { 60,  52,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  42,  51,  60 },
+            { 63,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  64 }
     };
 
     private final int TILE_SIZE = 30;
@@ -63,6 +68,39 @@ public class GameBoard extends Application {
 
     private Image staticGhostUp;
 
+    private Image Empty;
+    private Image Pellet;
+    private Image SuperPellet;
+    private Image UpperLeftCornerObstacle;
+    private Image ObstacleTopRightCorner;
+    private Image LowerLeftCornerObstacle;
+    private Image ObstacleLowerRightCorner;
+    private Image LeftVerticalHalfObstacleOrRightVerticalCornerWall;
+    private Image RightVerticalHalfObstacleOrLeftVerticalCornerWall;
+    private Image LowerHalfHorizontalObstacleOrUpperHalfHorizontalWall;
+    private Image UpperHalfHorizontalObstacleOrLowerHalfHorizontalWall;
+    private Image LowerRightCurveObstacleOrLowerRightCornerWall;
+    private Image LowerLeftCurveObstacleOrLowerLeftCornerWall;
+    private Image ObstacleUpperRightCornerOrWallUpperRightCorner;
+    private Image ObstacleUpperLeftCornerOrWallUpperLeftCorner;
+    private Image FullBlock;
+    private Image FullBlockTopLeftCornerRounded;
+    private Image FullBlockTopRightCornerRounded;
+    private Image FullBlockBottomLeftCornerRounded;
+    private Image FullBlockBottomRightCornerRounded;
+    private Image Portal;
+    private Image CageUpperLeftCorner;
+    private Image CageUpperRightCorner;
+    private Image LowerLeftCornerCage;
+    private Image CageLowerRightCorner;
+    private Image UpperHorizontalHalfCage;
+    private Image LowerHorizontalHalfCage;
+    private Image LeftHalfVerticalCage;
+    private Image RightHalfVerticalCage;
+    private Image UpperHorizontalHalfCageWithRightDoorCorners;
+    private Image UpperHorizontalHalfCageWithDoorCornersOnTheLeft;
+    private Image DoorCage;
+
     @Override
     public void start(Stage primaryStage) {
         loadImages();
@@ -79,6 +117,7 @@ public class GameBoard extends Application {
         drawCharacters(gc);
 
         Scene scene = new Scene(root);
+        scene.setFill(Color.BLACK);
         scene.setOnKeyPressed(this::handleKeyPressed);
         scene.setOnKeyReleased(this::handleKeyReleased);
 
@@ -90,6 +129,7 @@ public class GameBoard extends Application {
             @Override
             public void handle(long now) {
                 update();
+                gc.clearRect(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE); // Limpa o canvas
                 drawMap(gc);
                 drawCharacters(gc);
             }
@@ -107,20 +147,96 @@ public class GameBoard extends Application {
         pacmanLeftDown = new Image("/assets/pacman-Left-Down.gif");
 
         staticGhostUp = new Image("/assets/staticGhostUp.gif");
+
+        Empty  = new Image("/assets/maze/0-Empty.png");
+        Pellet = new Image("/assets/maze/5-Pellet.png");
+        SuperPellet = new Image("/assets/maze/10-Super-Pellet.png");
+        UpperLeftCornerObstacle = new Image("/assets/maze/11-Upper-Left-Corner-Obstacle.png");
+        ObstacleTopRightCorner = new Image("/assets/maze/12-Obstacle-Top-Right-Corner.png");
+        LowerLeftCornerObstacle = new Image("/assets/maze/21-Lower-Left-Corner-Obstacle.png");
+        ObstacleLowerRightCorner = new Image("/assets/maze/22-Obstacle-Lower-Right-Corner.png");
+        LeftVerticalHalfObstacleOrRightVerticalCornerWall = new Image("/assets/maze/31-Left-Vertical-Half-Obstacle-Or-Right-Vertical-Corner-Wall.png");
+        RightVerticalHalfObstacleOrLeftVerticalCornerWall = new Image("/assets/maze/32-Right-Vertical-Half-Obstacle-Or-Left-Vertical-Corner-Wall.png");
+        LowerHalfHorizontalObstacleOrUpperHalfHorizontalWall = new Image("/assets/maze/41-Lower-Half-Horizontal-Obstacle-Or-Upper-Half-Horizontal-Wall.png");
+        UpperHalfHorizontalObstacleOrLowerHalfHorizontalWall = new Image("/assets/maze/42-Upper-Half-Horizontal-Obstacle-Or-Lower-Half-Horizontal-Wall.png");
+        LowerRightCurveObstacleOrLowerRightCornerWall = new Image("/assets/maze/51-Lower-Right-Curve-Obstacle-Or-Lower-Right-Corner-Wall.png");
+        LowerLeftCurveObstacleOrLowerLeftCornerWall = new Image("/assets/maze/52-Lower-Left-Curve-Obstacle-Or-Lower-Left-Corner-Wall.png");
+        ObstacleUpperRightCornerOrWallUpperRightCorner = new Image("/assets/maze/53-Obstacle-Upper-Right-Corner-Or-Wall-Upper-Right-Corner.png");
+        ObstacleUpperLeftCornerOrWallUpperLeftCorner = new Image("/assets/maze/54-Obstacle-Upper-Left-Corner-Or-Wall-Upper-Left-Corner.png");
+        FullBlock = new Image("/assets/maze/60-Full-Block.png");
+        FullBlockTopLeftCornerRounded = new Image("/assets/maze/61-Full-Block-Top-Left-Corner-Rounded.png");
+        FullBlockTopRightCornerRounded = new Image("/assets/maze/62-Full-Block-Top-Right-Corner-Rounded.png");
+        FullBlockBottomLeftCornerRounded = new Image("/assets/maze/63-Full-Block-Bottom-Left-Corner-Rounded.png");
+        FullBlockBottomRightCornerRounded = new Image("/assets/maze/64-Full-Block-Bottom-Right-Corner-Rounded.png");
+        Portal = new Image("/assets/maze/70-Portal.png");
+        CageUpperLeftCorner = new Image("/assets/maze/81-Cage-Upper-Left-Corner.png");
+        CageUpperRightCorner = new Image("/assets/maze/82-Cage-Upper-Right-Corner.png");
+        LowerLeftCornerCage = new Image("/assets/maze/83-Lower-Left-Corner-Cage.png");
+        CageLowerRightCorner = new Image("/assets/maze/84-Cage-Lower-Right-Corner.png");
+        UpperHorizontalHalfCage = new Image("/assets/maze/91-Upper-Horizontal-Half-Cage.png");
+        LowerHorizontalHalfCage = new Image("/assets/maze/92-Lower-Horizontal-Half-Cage.png");
+        LeftHalfVerticalCage = new Image("/assets/maze/93-Left-Half-Vertical-Cage.png");
+        RightHalfVerticalCage = new Image("/assets/maze/94-Right-Half-Vertical-Cage.png");
+        UpperHorizontalHalfCageWithRightDoorCorners = new Image("/assets/maze/95-Upper-Horizontal-Half-Cage-With-Right-Door-Corners.png");
+        UpperHorizontalHalfCageWithDoorCornersOnTheLeft = new Image("/assets/maze/96-Upper-Horizontal-Half-Cage-With-Door-Corners-On-The-Left.png");
+        DoorCage = new Image("/assets/maze/100-Door-Cage.png");
+    }
+
+    public Image getEmpty(){
+        return Empty;
+    }
+
+    public Image getImageForType(int type) {
+        switch (type) {
+            case 0: return Empty;
+            case 5: return Pellet;
+            case 10: return SuperPellet;
+            case 11: return UpperLeftCornerObstacle;
+            case 12: return ObstacleTopRightCorner;
+            case 21: return LowerLeftCornerObstacle;
+            case 22: return ObstacleLowerRightCorner;
+            case 31: return LeftVerticalHalfObstacleOrRightVerticalCornerWall;
+            case 32: return RightVerticalHalfObstacleOrLeftVerticalCornerWall;
+            case 41: return LowerHalfHorizontalObstacleOrUpperHalfHorizontalWall;
+            case 42: return UpperHalfHorizontalObstacleOrLowerHalfHorizontalWall;
+            case 51: return LowerRightCurveObstacleOrLowerRightCornerWall;
+            case 52: return LowerLeftCurveObstacleOrLowerLeftCornerWall;
+            case 53: return ObstacleUpperRightCornerOrWallUpperRightCorner;
+            case 54: return ObstacleUpperLeftCornerOrWallUpperLeftCorner;
+            case 60: return FullBlock;
+            case 61: return FullBlockTopLeftCornerRounded;
+            case 62: return FullBlockTopRightCornerRounded;
+            case 63: return FullBlockBottomLeftCornerRounded;
+            case 64: return FullBlockBottomRightCornerRounded;
+            case 70: return Portal;
+            case 81: return CageUpperLeftCorner;
+            case 82: return CageUpperRightCorner;
+            case 83: return LowerLeftCornerCage;
+            case 84: return CageLowerRightCorner;
+            case 91: return UpperHorizontalHalfCage;
+            case 92: return LowerHorizontalHalfCage;
+            case 93: return LeftHalfVerticalCage;
+            case 94: return RightHalfVerticalCage;
+            case 95: return UpperHorizontalHalfCageWithRightDoorCorners;
+            case 96: return UpperHorizontalHalfCageWithDoorCornersOnTheLeft;
+            case 100: return DoorCage;
+            default: return null;
+        }
     }
 
     // Inicializando mapa
     private void initializeMap() {
         for (int y = 0; y < MAP_HEIGHT; y++) {
             for (int x = 0; x < MAP_WIDTH; x++) {
-                map[y][x] = new MazeBlock(mazeLayout[y][x], x, y, TILE_SIZE);
+                Image img = getImageForType(mazeLayout[y][x]);
+                map[y][x] = new MazeBlock(mazeLayout[y][x], x, y, TILE_SIZE, img);
             }
         }
     }
 
     // Inicializando personagens
     private void initializeCharacters() {
-        pacMan = new PacMan(0, 0, TILE_SIZE, pacmanRight);
+        pacMan = new PacMan(2, 2, TILE_SIZE, pacmanRight);
         ghosts = new Ghost[] {
                 new Ghost(GameBoard.ghostsLocation(1, mazeLayout)[1], GameBoard.ghostsLocation(1, mazeLayout)[0], TILE_SIZE, staticGhostUp),
                 new Ghost(GameBoard.ghostsLocation(2, mazeLayout)[1], GameBoard.ghostsLocation(2, mazeLayout)[0], TILE_SIZE, staticGhostUp),
@@ -205,6 +321,7 @@ public class GameBoard extends Application {
     private void update() {
         pacMan.move(dx, dy, map);
         pacMan.collectPellet(map);
+        pacMan.collectSuperPellet(map);
     }
 
     // Obter a posição que os fantasmas devem estar
