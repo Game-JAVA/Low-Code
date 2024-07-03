@@ -1,5 +1,11 @@
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.util.Duration;
 
 public class PacMan extends Character {
 
@@ -11,20 +17,30 @@ public class PacMan extends Character {
     private Image Empty = new Image("/assets/maze/0-Empty.png");;
     private int score; // Atributo para armazenar o score
 
+    private DoubleProperty translateX;
+    private DoubleProperty translateY;
+    private GameBoard gameBoard; // Adicionar referência à GameBoard
+    private double speed = 0.004; // Velocidade do PacMan (tiles por milissegundo)
+    private double bufferX = 0; // Buffer para posição X
+    private double bufferY = 0; // Buffer para posição Y
+
     // Constructor
     public PacMan(int x, int y, int tileSize, Image image) {
         super(x, y, tileSize);
         this.image = image;
         this.direction = "Right"; // Direção inicial
-        this.moveInterval = 200; // Intervalo de movimento em milissegundos
+        this.moveInterval = 175; // Intervalo de movimento em milissegundos
         this.lastMoveTime = System.currentTimeMillis();
+        this.gameBoard = gameBoard; // Inicializar referência à GameBoard
+        this.translateX = new SimpleDoubleProperty(x * tileSize);
+        this.translateY = new SimpleDoubleProperty(y * tileSize);
         this.score = 0; // Inicializa o score
     }
 
     // Methods
     @Override
     public void draw(GraphicsContext gc) {
-        gc.drawImage(image, x * tileSize, y * tileSize, tileSize, tileSize);
+        gc.drawImage(image, translateX.get(), translateY.get(), tileSize, tileSize);
     }
 
     @Override
@@ -54,11 +70,25 @@ public class PacMan extends Character {
             }
 
             if (newX >= 0 && newX < map[0].length && newY >= 0 && newY < map.length && !map[newY][newX].isWall()) {
+                animateMove(newX, newY);
                 x = newX;
                 y = newY;
             }
             lastMoveTime = currentTime;
         }
+    }
+
+    //Suaviazar movimento do PacMan
+    public void animateMove(int newX, int newY){
+        double targetX = newX * tileSize;
+        double targetY = newY * tileSize;
+
+        Timeline timeline = new Timeline();
+        KeyValue kvX = new KeyValue(translateX, targetX);
+        KeyValue kvY = new KeyValue(translateY, targetY);
+        KeyFrame kf = new KeyFrame(Duration.millis(moveInterval), kvX, kvY);
+        timeline.getKeyFrames().add(kf);
+        timeline.play();
     }
 
     public void collectPellet(MazeBlock[][] map) {
