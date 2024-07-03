@@ -7,6 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public class GameBoard extends Application {
@@ -101,6 +103,9 @@ public class GameBoard extends Application {
     private Image UpperHorizontalHalfCageWithDoorCornersOnTheLeft;
     private Image DoorCage;
 
+    private Image lifeImage;
+    private int lives = 3;
+
     @Override
     public void start(Stage primaryStage) {
         loadImages();
@@ -132,6 +137,7 @@ public class GameBoard extends Application {
                 gc.clearRect(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE); // Limpa o canvas
                 drawMap(gc);
                 drawCharacters(gc);
+                drawScore(gc); // Desenha o score
             }
         };
         timer.start();
@@ -147,6 +153,8 @@ public class GameBoard extends Application {
         pacmanLeftDown = new Image("/assets/pacman-Left-Down.gif");
 
         staticGhostUp = new Image("/assets/staticGhostUp.gif");
+
+        lifeImage = new Image("/assets/heart.png"); // Nova imagem para vida
 
         Empty  = new Image("/assets/maze/0-Empty.png");
         Pellet = new Image("/assets/maze/5-Pellet.png");
@@ -323,6 +331,22 @@ public class GameBoard extends Application {
         pacMan.collectPellet(map);
         pacMan.collectSuperPellet(map);
     }
+
+    private void drawScore(GraphicsContext gc) {
+        gc.setFill(Color.YELLOW);
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 20)); // Define o tamanho da fonte para 20 e negrito
+        gc.fillText("Score: " + pacMan.getScore(), 50, 40);
+
+        // Desenhar o placar, incluindo as vidas
+        int startX = MAP_WIDTH * TILE_SIZE - 150; // Posição inicial X no canto superior direito
+        int startY = 20; // Posição inicial Y no canto superior
+
+        // Desenha as vidas restantes
+        for (int i = 0; i < lives; i++) {
+            gc.drawImage(lifeImage, startX + i * 40, startY, 20, 20); // Ajusta o tamanho para 20x20
+        }
+    }
+
 
     // Obter a posição que os fantasmas devem estar
     private static int[] ghostsLocation(int ghostNumber, int[][] mazeLayout) {
