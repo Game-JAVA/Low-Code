@@ -9,6 +9,7 @@ public class PacMan extends Character {
     private long lastMoveTime;
     private long moveInterval; // Intervalo de movimento em milissegundos
     private Image Empty = new Image("/assets/maze/0-Empty.png");;
+    private int score; // Atributo para armazenar o score
 
     // Constructor
     public PacMan(int x, int y, int tileSize, Image image) {
@@ -17,6 +18,7 @@ public class PacMan extends Character {
         this.direction = "Right"; // Direção inicial
         this.moveInterval = 200; // Intervalo de movimento em milissegundos
         this.lastMoveTime = System.currentTimeMillis();
+        this.score = 0; // Inicializa o score
     }
 
     // Methods
@@ -63,6 +65,7 @@ public class PacMan extends Character {
         if (map[y][x].isPellet()) {
             map[y][x].setType(0); // Limpar o superPellet
             map[y][x].setImage(Empty); // Limpar o superPellet
+            score += 10; // Adiciona 10 pontos ao score
         }
     }
 
@@ -71,6 +74,7 @@ public class PacMan extends Character {
         if (map[y][x].isSuperPellet()) {
             map[y][x].setType(0); // Limpar o superPellet
             map[y][x].setImage(Empty); // Limpar o superPellet
+            score += 50; // Adiciona 50 pontos ao score
         }
     }
 
@@ -94,4 +98,9 @@ public class PacMan extends Character {
     public void setMoveInterval(long moveInterval) {
         this.moveInterval = moveInterval;
     }
+
+    public int getScore() {
+        return score; // Método para obter o score
+    }
+
 }
