@@ -50,4 +50,8 @@ public class MazeBlock {
     public void setImage(Image image) {
         this.image = image;
     }
+
+    public int getType() {
+        return type;
+    }
 }
