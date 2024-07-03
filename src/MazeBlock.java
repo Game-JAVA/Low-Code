@@ -27,7 +27,7 @@ public class MazeBlock {
     }
 
     public boolean isWall() {
-        return type != 0 && type != 5 && type != 10;
+        return type != 0 && type != 5 && type != 10 && type != 1 && type != 2 && type != 3 && type != 4;
     }
 
     public boolean isPellet() {
