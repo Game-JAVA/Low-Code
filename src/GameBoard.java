@@ -10,6 +10,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import java.util.Objects;
+import javafx.util.Duration;
+import javafx.scene.input.KeyCode;
+import javafx.animation.PauseTransition;
 
 public class GameBoard extends Application {
 
@@ -18,6 +22,9 @@ public class GameBoard extends Application {
     private Ghost[] ghosts;
     private int dx = 0;
     private int dy = 0;
+    private boolean isGameOver = false;
+    private int lives = 3;
+    private boolean gameRunning = true;
 
     private int[][] mazeLayout = {
             { 61,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  62 },
@@ -33,7 +40,7 @@ public class GameBoard extends Application {
             { 60,  52,  42,  42,  42,  42,  12,   5,  31,  32,   5,  11,  12,   5,  31,  32,   5,  11,  42,  42,  51,  52,  42,  42,  12,   5,  31,  32,   5,  11,  42,  42,  51,  52,  42,  42,  12,   5,  31,  32,   5,  11,  12,   5,  31,  32,   5,  11,  42,  42,  42,  42,  51,  60 },
             { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  32,   5,  21,  22,   5,  21,  41,  41,  53,  54,  41,  41,  22,   0,  21,  22,   0,  21,  41,  41,  53,  54,  41,  41,  22,   5,  21,  22,   5,  31,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
             { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,  31,  32,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  31,  32,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
-            { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  32,   5,  11,  42,  42,  42,  12,   5,  31,  32,   0,  81,  91,  95, 100, 100,  96,  91,  82,   0,  31,  32,   5,  11,  42,  42,  42,  12,   5,  31,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
+            { 60,  60,  60,  60,  60,  60,  32,   5,  31,  32,   5,  31,  32,   5,  11,  42,  42,  42,  12,   5,  31,  32,   0,  81,  91,  95,   0,   0,  96,  91,  82,   0,  31,  32,   5,  11,  42,  42,  42,  12,   5,  31,  32,   5,  31,  32,   5,  31,  60,  60,  60,  60,  60,  60 },
             { 41,  41,  41,  41,  41,  41,  22,   5,  21,  22,   5,  21,  22,   5,  31,  54,  41,  41,  22,   5,  21,  22,   0,  93,   0,   0,   0,   0,   0,   0,  94,   0,  21,  22,   5,  21,  41,  41,  53,  32,   5,  21,  22,   5,  21,  22,   5,  21,  41,  41,  41,  41,  41,  41 },
             { 70,   0,   0,   0,   0,   0,   0,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   0,   0,  93,   0,   0,   0,   0,   0,   0,  94,   0,   0,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   0,   0,   0,   0,   0,   0,  70 },
             { 42,  42,  42,  42,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  51,  32,   5,  11,  42,  42,  42,  12,   0,  93,   0,   1,   2,   3,   4,   0,  94,   0,  11,  42,  42,  42,  12,   5,  31,  52,  42,  42,  12,   5,  11,  12,   5,  11,  42,  42,  42,  42,  42,  42 },
@@ -103,8 +110,8 @@ public class GameBoard extends Application {
     private Image UpperHorizontalHalfCageWithDoorCornersOnTheLeft;
     private Image DoorCage;
 
+    private Image gameOverImage;
     private Image lifeImage;
-    private int lives = 3;
 
     @Override
     public void start(Stage primaryStage) {
@@ -126,18 +133,61 @@ public class GameBoard extends Application {
         scene.setOnKeyPressed(this::handleKeyPressed);
         scene.setOnKeyReleased(this::handleKeyReleased);
 
+        //TRAVA A TELA (REDIMENSIONAR)
+        primaryStage.setResizable(false);
+
+
         primaryStage.setTitle("PacMan Game - Low Code");
         primaryStage.setScene(scene);
         primaryStage.show();
 
         AnimationTimer timer = new AnimationTimer() {
+            private boolean gameOverShown = false;
+            private long gameOverStartTime;
+
             @Override
             public void handle(long now) {
-                update();
-                gc.clearRect(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE); // Limpa o canvas
-                drawMap(gc);
-                drawCharacters(gc);
-                drawScore(gc); // Desenha o score
+                if (gameRunning) {
+                    update();
+                    gc.clearRect(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE); // Limpa o canvas
+                    drawMap(gc);
+                    drawCharacters(gc);
+                    drawScore(gc); // Desenha o score
+
+                    if (!isGameOver) {
+                        pacMan.move(dx, dy, map);
+                        checkCollision(); // Verificar colisão após cada movimento do PacMan
+
+                        // Movimento dos fantasmas
+                        for (Ghost ghost : ghosts) {
+                            ghost.move(0, 0, map);
+                        }
+
+                    } else {
+                        if (!gameOverShown) {
+                            gameOverStartTime = System.nanoTime();
+                            gameOverShown = true;
+                            //ACREDITO QUE AQUI DEVE ARMAZENAR OS SCORES E PELLETS COLETADOS
+                        }
+
+                        long elapsedTime = System.nanoTime() - gameOverStartTime;
+                        double secondsToShowGameOver = 0.1; // Tempo desejado em segundos
+                        if (elapsedTime >= secondsToShowGameOver * 1e9) {
+                            // Reduz a imagem de Game Over após o tempo desejado
+                            gc.drawImage(gameOverImage, (canvas.getWidth() - gameOverImage.getWidth() / 2) / 2,
+                                    (canvas.getHeight() - gameOverImage.getHeight() / 2) / 2,
+                                    gameOverImage.getWidth() / 2, gameOverImage.getHeight() / 2);
+
+                            // Define o jogo como não rodando após mostrar Game Over
+                            gameRunning = false;
+                            PauseTransition delay = new PauseTransition(Duration.seconds(3));
+                            delay.setOnFinished(e -> {
+                                resetGame(); // Inicializar o estado do jogo
+                            });
+                            delay.play();
+                        }
+                    }
+                }
             }
         };
         timer.start();
@@ -155,6 +205,7 @@ public class GameBoard extends Application {
         staticGhostUp = new Image("/assets/staticGhostUp.gif");
 
         lifeImage = new Image("/assets/heart.png"); // Nova imagem para vida
+        gameOverImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/game-over.png")));
 
         Empty  = new Image("/assets/maze/0-Empty.png");
         Pellet = new Image("/assets/maze/5-Pellet.png");
@@ -272,6 +323,12 @@ public class GameBoard extends Application {
 
     // Verificando teclas pressionadas pelo usuário
     private void handleKeyPressed(KeyEvent event) {
+        if (isGameOver && event.getCode() == KeyCode.SPACE) {
+            resetGame();
+            return;
+        }
+
+
         switch (event.getCode()) {
             case W:
             case UP:
@@ -322,14 +379,36 @@ public class GameBoard extends Application {
 
 
     private void handleKeyReleased(KeyEvent event) {
-        dx = 0;
-        dy = 0;
+        if (!isGameOver) {
+            dx = 0;
+            dy = 0;
+        }
+    }
+
+    // checkCollision() para verificar colisão entre PacMan e fantasmas
+    private void checkCollision() {
+        // Obter as coordenadas do PacMan
+        int pacManX = pacMan.getX();
+        int pacManY = pacMan.getY();
+
+        // Verificar colisão com cada fantasma
+        for (Ghost ghost : ghosts) {
+            int ghostX = ghost.getX();
+            int ghostY = ghost.getY();
+
+            if (pacManX == ghostX && pacManY == ghostY) {
+                // Colisão detectada, jogo acabou
+                isGameOver = true;
+                break;
+            }
+        }
     }
 
     private void update() {
         pacMan.move(dx, dy, map);
         pacMan.collectPellet(map);
         pacMan.collectSuperPellet(map);
+        checkCollision();
     }
 
     private void drawScore(GraphicsContext gc) {
@@ -364,6 +443,16 @@ public class GameBoard extends Application {
 
         // Se o fantasma não for encontrado retorna [-1, -1] como uma posição inválida.
         return new int[]{-1, -1};
+    }
+
+    private void resetGame() {
+        gameRunning = true;
+        isGameOver = false;
+        System.out.println("Game Resetado");
+        initializeMap();
+        initializeCharacters();
+        dx = 0;
+        dy = 0;
     }
 
     public static void main(String[] args) {
