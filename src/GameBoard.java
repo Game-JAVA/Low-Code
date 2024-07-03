@@ -15,6 +15,10 @@ import javafx.util.Duration;
 import javafx.scene.input.KeyCode;
 import javafx.animation.PauseTransition;
 
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+
+
 public class GameBoard extends Application {
 
     // Attributes
@@ -25,6 +29,7 @@ public class GameBoard extends Application {
     private boolean isGameOver = false;
     private int lives = 3;
     private boolean gameRunning = true;
+    private long startTime;
 
     private int[][] mazeLayout = {
             { 61,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  62 },
@@ -141,6 +146,8 @@ public class GameBoard extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        startTime = System.nanoTime();
+
         AnimationTimer timer = new AnimationTimer() {
             private boolean gameOverShown = false;
             private long gameOverStartTime;
@@ -148,7 +155,7 @@ public class GameBoard extends Application {
             @Override
             public void handle(long now) {
                 if (gameRunning) {
-                    update();
+                    update(now);
                     gc.clearRect(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE); // Limpa o canvas
                     drawMap(gc);
                     drawCharacters(gc);
@@ -316,8 +323,8 @@ public class GameBoard extends Application {
     // Desenhando personagens
     private void drawCharacters(GraphicsContext gc) {
         pacMan.draw(gc);
-        for (int i = 0; i < ghosts.length; i++) {
-            ghosts[i].draw(gc);
+        for (Ghost ghost : ghosts) {
+            ghost.draw(gc);
         }
     }
 
@@ -404,12 +411,24 @@ public class GameBoard extends Application {
         }
     }
 
-    private void update() {
+    private void update(long currentTime) {
         pacMan.move(dx, dy, map);
         pacMan.collectPellet(map);
         pacMan.collectSuperPellet(map);
         checkCollision();
+    
+
+    if (currentTime - startTime > 5_000_000_000L) { // 5 segundos em nanossegundos
+            for (Ghost ghost : ghosts) {
+                ghost.setChasing(true);
+            }
+        }
+
+        for (Ghost ghost : ghosts) {
+            ghost.move(pacMan, map, currentTime);
+        }
     }
+
 
     private void drawScore(GraphicsContext gc) {
         gc.setFill(Color.YELLOW);
