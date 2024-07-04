@@ -13,15 +13,12 @@ public class PacMan extends Character {
     private Image image;
     private String direction;
     private long lastMoveTime;
-    private long moveInterval; // Intervalo de movimento em milissegundos
-    private Image Empty = new Image("/assets/maze/0-Empty.png");;
+    private final long moveInterval; // Intervalo de movimento em milissegundos
+    private final Image Empty = new Image("/assets/maze/0-Empty.png");
     private int score; // Atributo para armazenar o score
 
-    private DoubleProperty translateX;
-    private DoubleProperty translateY;
-    private GameBoard gameBoard; // Adicionar referência à GameBoard
-    private double bufferX = 0; // Buffer para posição X
-    private double bufferY = 0; // Buffer para posição Y
+    private final DoubleProperty translateX;
+    private final DoubleProperty translateY;
 
     // Constructor
     public PacMan(int x, int y, int tileSize, Image image) {
@@ -30,7 +27,6 @@ public class PacMan extends Character {
         this.direction = "Right"; // Direção inicial
         this.moveInterval = 175; // Intervalo de movimento em milissegundos
         this.lastMoveTime = System.currentTimeMillis();
-        this.gameBoard = gameBoard; // Inicializar referência à GameBoard
         this.translateX = new SimpleDoubleProperty(x * tileSize);
         this.translateY = new SimpleDoubleProperty(y * tileSize);
         this.score = 0; // Inicializa o score
@@ -108,9 +104,6 @@ public class PacMan extends Character {
     }
 
     // Getters and Setters
-    public Image getImage(){
-        return image;
-    }
 
     public void setImage(Image image) {
         this.image = image;
@@ -122,10 +115,6 @@ public class PacMan extends Character {
 
     public void setDirection(String direction) {
         this.direction = direction;
-    }
-
-    public void setMoveInterval(long moveInterval) {
-        this.moveInterval = moveInterval;
     }
 
     public int getScore() {
