@@ -15,10 +15,6 @@ import javafx.util.Duration;
 import javafx.scene.input.KeyCode;
 import javafx.animation.PauseTransition;
 
-import javafx.animation.Timeline;
-import javafx.util.Duration;
-
-
 public class GameBoard extends Application {
 
     // Attributes
@@ -27,11 +23,10 @@ public class GameBoard extends Application {
     private int dx = 0;
     private int dy = 0;
     private boolean isGameOver = false;
-    private int lives = 3;
     private boolean gameRunning = true;
     private long startTime;
 
-    private int[][] mazeLayout = {
+    private final int[][] mazeLayout = {
             { 61,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  62 },
             { 60,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  60 },
             { 60,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  32,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,   5,  31,  60 },
@@ -71,7 +66,7 @@ public class GameBoard extends Application {
     private final int MAP_HEIGHT = mazeLayout.length;
     private final int MAP_WIDTH = mazeLayout[0].length;
 
-    private MazeBlock[][] map = new MazeBlock[MAP_HEIGHT][MAP_WIDTH];
+    private final MazeBlock[][] map = new MazeBlock[MAP_HEIGHT][MAP_WIDTH];
 
     private Image pacmanRightUp;
     private Image pacmanRight;
@@ -246,10 +241,6 @@ public class GameBoard extends Application {
         UpperHorizontalHalfCageWithRightDoorCorners = new Image("/assets/maze/95-Upper-Horizontal-Half-Cage-With-Right-Door-Corners.png");
         UpperHorizontalHalfCageWithDoorCornersOnTheLeft = new Image("/assets/maze/96-Upper-Horizontal-Half-Cage-With-Door-Corners-On-The-Left.png");
         DoorCage = new Image("/assets/maze/100-Door-Cage.png");
-    }
-
-    public Image getEmpty(){
-        return Empty;
     }
 
     public Image getImageForType(int type) {
@@ -431,6 +422,7 @@ public class GameBoard extends Application {
 
 
     private void drawScore(GraphicsContext gc) {
+        int lives = 3;
         gc.setFill(Color.YELLOW);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 20)); // Define o tamanho da fonte para 20 e negrito
         gc.fillText("Score: " + pacMan.getScore(), 50, 40);
