@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import java.util.*;
+
 public class Ghost extends Character {
 
     // Atributos
@@ -19,11 +21,10 @@ public class Ghost extends Character {
     private Image image; // Imagem do fantasma
     private long lastMoveTime; // Tempo do último movimento
     private double moveInterval = 185_000_000; // Intervalo de meio segundo (em nanossegundos)
-    private double speed = 0.004;
     private boolean isChasing = false; // Indica se o fantasma está perseguindo o Pac-Man
     private boolean isExitingBase = true; // Indica se o fantasma está saindo da base
     private boolean hasExitedBase = false; // Indica se o fantasma já saiu da base
-    private static final int CHASE_RANGE = 5; // Distância de perseguição em blocos
+    private static final int CHASE_RANGE = 10; // Distância de perseguição em blocos
     private int lastDirection = -1; // Última direção do movimento
 
     private DoubleProperty translateX;
@@ -74,29 +75,53 @@ public class Ghost extends Character {
         int targetX = pacMan.getX(); // Coordenada x do Pac-Man
         int targetY = pacMan.getY(); // Coordenada y do Pac-Man
 
-        List<int[]> possibleMoves = new ArrayList<>(); // Lista de movimentos possíveis
+        List<int[]> path = findPath(x, y, targetX, targetY, map);
+        if (!path.isEmpty()) {
+            int[] nextMove = path.get(0);
+            animateMove(nextMove[0], nextMove[1]);
+            x = nextMove[0];
+            y = nextMove[1];
+        }
+    }
 
-        // Verifica os movimentos possíveis (cima, baixo, esquerda, direita)
-        if (targetX < x && !map[y][x - 1].isWall()) {
-            possibleMoves.add(new int[]{-1, 0}); // Adiciona movimento para a esquerda
-        }
-        if (targetX > x && !map[y][x + 1].isWall()) {
-            possibleMoves.add(new int[]{1, 0}); // Adiciona movimento para a direita
-        }
-        if (targetY < y && !map[y - 1][x].isWall()) {
-            possibleMoves.add(new int[]{0, -1}); // Adiciona movimento para cima
-        }
-        if (targetY > y && !map[y + 1][x].isWall()) {
-            possibleMoves.add(new int[]{0, 1}); // Adiciona movimento para baixo
+    private List<int[]> findPath(int startX, int startY, int targetX, int targetY, MazeBlock[][] map) {
+        Queue<int[]> queue = new LinkedList<>();
+        Map<String, int[]> predecessors = new HashMap<>();
+        queue.add(new int[]{startX, startY});
+        String targetKey = targetX + "," + targetY;
+        boolean found = false;
+
+        while (!queue.isEmpty() && !found) {
+            int[] current = queue.poll();
+            int currentX = current[0];
+            int currentY = current[1];
+
+            for (int[] dir : new int[][]{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}) {
+                int newX = currentX + dir[0];
+                int newY = currentY + dir[1];
+                String key = newX + "," + newY;
+
+                if (newX >= 0 && newX < map[0].length && newY >= 0 && newY < map.length && !map[newY][newX].isWall() && !predecessors.containsKey(key)) {
+                    predecessors.put(key, new int[]{currentX, currentY});
+                    queue.add(new int[]{newX, newY});
+                    if (key.equals(targetKey)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
         }
 
-        // Move na direção do Pac-Man em uma das direções possíveis
-        if (!possibleMoves.isEmpty()) {
-            int[] move = possibleMoves.get(new Random().nextInt(possibleMoves.size())); // Escolhe uma direção aleatória
-            animateMove(x + move[0], y + move[1]);
-            x += move[0]; // Atualiza a coordenada x
-            y += move[1]; // Atualiza a coordenada y
+        List<int[]> path = new ArrayList<>();
+        if (found) {
+            int[] step = new int[]{targetX, targetY};
+            while (!Arrays.equals(step, new int[]{startX, startY})) {
+                path.add(0, step);
+                step = predecessors.get(step[0] + "," + step[1]);
+            }
         }
+
+        return path;
     }
 
     private void exitBase(MazeBlock[][] map) {
