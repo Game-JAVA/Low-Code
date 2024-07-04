@@ -14,7 +14,8 @@ import java.util.Objects;
 import javafx.util.Duration;
 import javafx.scene.input.KeyCode;
 import javafx.animation.PauseTransition;
-
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 public class GameBoard extends Application {
 
     // Attributes
@@ -25,7 +26,7 @@ public class GameBoard extends Application {
     private boolean isGameOver = false;
     private boolean gameRunning = true;
     private long startTime;
-
+    private int lives = 3;
     private final int[][] mazeLayout = {
             { 61,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  62 },
             { 60,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  60 },
@@ -395,8 +396,13 @@ public class GameBoard extends Application {
             int ghostY = ghost.getY();
 
             if (pacManX == ghostX && pacManY == ghostY) {
-                // Colisão detectada, jogo acabou
-                isGameOver = true;
+                // Colisão detectada
+                lives--;
+                if (lives>0){
+                    initializeCharacters();
+                }else{
+                    isGameOver = true;
+                }
                 break;
             }
         }
@@ -407,7 +413,7 @@ public class GameBoard extends Application {
         pacMan.collectPellet(map);
         pacMan.collectSuperPellet(map);
         checkCollision();
-    
+
 
     if (currentTime - startTime > 5_000_000_000L) { // 5 segundos em nanossegundos
             for (Ghost ghost : ghosts) {
@@ -422,7 +428,6 @@ public class GameBoard extends Application {
 
 
     private void drawScore(GraphicsContext gc) {
-        int lives = 3;
         gc.setFill(Color.YELLOW);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 20)); // Define o tamanho da fonte para 20 e negrito
         gc.fillText("Score: " + pacMan.getScore(), 50, 40);
@@ -460,6 +465,7 @@ public class GameBoard extends Application {
         gameRunning = true;
         isGameOver = false;
         System.out.println("Game Resetado");
+        lives = 3;
         initializeMap();
         initializeCharacters();
         dx = 0;
