@@ -20,7 +20,6 @@ public class PacMan extends Character {
     private DoubleProperty translateX;
     private DoubleProperty translateY;
     private GameBoard gameBoard; // Adicionar referência à GameBoard
-    private double speed = 0.004; // Velocidade do PacMan (tiles por milissegundo)
     private double bufferX = 0; // Buffer para posição X
     private double bufferY = 0; // Buffer para posição Y
 
