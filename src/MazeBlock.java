@@ -6,9 +6,9 @@ public class MazeBlock {
     // Attributes
 
     private int type;
-    private int x;
-    private int y;
-    private int tileSize;
+    private final int x;
+    private final int y;
+    private final int tileSize;
     private Image image;
 
     // Constructor
@@ -41,10 +41,6 @@ public class MazeBlock {
     // Getters and Setters
     public void setType(int type) {
         this.type = type;
-    }
-
-    public Image getImage() {
-        return image;
     }
 
     public void setImage(Image image) {
