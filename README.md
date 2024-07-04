@@ -51,155 +51,186 @@ After installing the software, the next step is to clone our project. To do this
 # Game Class Diagram
 
 ```mermaid
-
 ---
 title: UML Diagram
 ---
 
 classDiagram
 
-Characters <|-- Pacman
-Characters <|-- Ghost
+Character <|-- PacMan
+Character <|-- Ghost
 MazeBlock <|-- GameBoard
-Pellets <|-- GameBoard
-Pellets <|-- Powerup
-GameBoard <|-- EventRunner
 
-class GameBoard{
-    - titleScreenImage : Image
-    - endGameImage : Image
-    - winScreenImage: Image
-    - pacman : Pacman
-    - ghosts : Ghost[]
-    - score : int
-    - numLives : int
-    - mazeBlockPositions : int[][]
-    - mazeBlocks: MazeBlock[][]
-    - tempPellets : Pellet[][]
-    - showTitleScreen : boolean
-    - showWinScreen : boolean
-    - showEndGameScreen : boolean
-    - initiateNewGame : int
-    - pacmanDying : int
-    - timer : long
-    - font : Font
-    - font2 : Font
-    + GameBoard()
-    + reset() void
-    + repositionCharacters() void
-    + paintComponent(Graphics) void
-    + collided() boolean
-    + pacmanCanEatGhost() int
-    + eatGhost() void
-    + decrementLives() void
-    + getLives() int
-    + eatPellets() void
-    + incrementScore(int) void
+class GameBoard {
+    - pacMan: PacMan
+    - ghosts: Ghost[]
+    - dx: int
+    - dy: int
+
+    - isGameOver: boolean
+    - gameRunning: boolean
+    - startTime: long
+
+    - mazeLayout: int[][]
+
+    - TILE_SIZE: int
+    - MAP_HEIGHT: int
+    - MAP_WIDTH: int
+
+    - map: MazeBlock[][]
+
+    - pacmanRightUp: Image
+    - pacmanRight: Image
+    - pacmanRightDown: Image
+    - pacmanLeftUp: Image
+    - pacmanLeft: Image
+    - pacmanLeftDown: Image
+
+    - staticGhostUp: Image
+
+    - Empty: Image
+    - Pellet: Image
+    - SuperPellet: Image
+    - UpperLeftCornerObstacle: Image
+    - ObstacleTopRightCorner: Image
+    - LowerLeftCornerObstacle: Image
+    - ObstacleLowerRightCorner: Image
+    - LeftVerticalHalfObstacleOrRightVerticalCornerWall: Image
+    - RightVerticalHalfObstacleOrLeftVerticalCornerWall: Image
+    - LowerHalfHorizontalObstacleOrUpperHalfHorizontalWall: Image
+    - UpperHalfHorizontalObstacleOrLowerHalfHorizontalWall: Image
+    - LowerRightCurveObstacleOrLowerRightCornerWall: Image
+    - LowerLeftCurveObstacleOrLowerLeftCornerWall: Image
+    - ObstacleUpperRightCornerOrWallUpperRightCorner: Image
+    - ObstacleUpperLeftCornerOrWallUpperLeftCorner: Image
+    - FullBlock: Image
+    - FullBlockTopLeftCornerRounded: Image
+    - FullBlockTopRightCornerRounded: Image
+    - FullBlockBottomLeftCornerRounded: Image
+    - FullBlockBottomRightCornerRounded: Image
+    - Portal: Image
+    - CageUpperLeftCorner: Image
+    - CageUpperRightCorner: Image
+    - LowerLeftCornerCage: Image
+    - CageLowerRightCorner: Image
+    - UpperHorizontalHalfCage: Image
+    - LowerHorizontalHalfCage: Image
+    - LeftHalfVerticalCage: Image
+    - RightHalfVerticalCage: Image
+    - UpperHorizontalHalfCageWithRightDoorCorners: Image
+    - UpperHorizontalHalfCageWithDoorCornersOnTheLeft: Image
+    - DoorCage: Image
+
+    - gameOverImage: Image
+    - lifeImage: Image
+
+    + start(Stage) void
+    + loadImages() void
+    + getImageForType(int) Image
+    + initializeMap() void
+    + initializeCharacters() void
+    + drawMap(GraphicsContext) void
+    + drawCharacters(GraphicsContext) void
+    + handleKeyPressed(KeyEvent) void
+    + handleKeyReleased(KeyEvent) void
+    + checkCollision() void
+    + update(long) void
+    + drawScore(GraphicsContext) void
+    + ghostLocation(int, int[][]) int[]
+    + resetGame() void
+    + main(String[]) void
+}
+
+class Character {
+    - x: int
+    - y: int
+    - tileSize: int
+
+    + Character(int, int, int)
+
+    + draw(GraphicsContext) void
+    + move(int, int, MazeBlock[][]) void
+
+    + getX() int
+    + getY() int
+}
+
+class PacMan {
+    - image: Image
+    - direction: String
+    - lastMoveTime: long
+    - moveInterval: long
+    - Empty: Image
+    - score: int
+
+    - translateX: DoubleProperty
+    - translateY: DoubleProperty
+
+    - gameBoard: GameBoard
+    - speed: double
+    - bufferX: double
+    - bufferY: double
+
+    + PacMan(int, int, int, Image, Image)
+
+    + draw(GraphicsContext) void
+    + move(int, int, MazeBlock[][]) void
+    + animateMove(int, int) void
+    + collectPellet(MazeBlock[][]) void
+    + collectSuperPellet(MazeBlock[][]) void
+
+    + setImage(Image) void
+    + getDirection() String
+    + setDirection(String) void
     + getScore() int
 }
 
-class Characters{
-    - up : int
-    - down : int
-    - left : int
-    - right : int
+class Ghost {
+    - initialX: int
+    - initialY: int
+    - image: Image
+    - lastMoveTime: long
+    - moveInterval: double
+    - speed: double
+    - isChasing: boolean
+    - isExitingBase: boolean
+    - hasExitedBase: boolean
+    - CHASE_RANGE: int
+    - lastDirection: int
+
+    + Ghost(int, int, int, Image)
+
+    + draw(GraphicsContext) void
+    + move(int, int, MazeBlock[][]) void
+    + move(PacMan, MazeBlock[][], long) void
+    + isWithinChaseRange(PacMan) boolean
+    + chasePacMan(PacMan, MazeBlock[][]) void
+    + exitBase(MazeBlock[][]) void
+    + moveRandomly(MazeBlock[][]) void
+
     + getX() int
     + getY() int
-    + setX(int) void
-    + setY(int) void
-    + setDirection(String) void
-    + move() void
-    + isFacingBlock() boolean
-    + respawn() void
-    + paintCharacter(Graphics) void
+    + setChasing(boolean) void
 }
 
-class Pacman{
-    - PACMAN_WIDTH : int
-    - PACMAN_HEIGHT : int
-    - x : int
+class MazeBlock {
+    - type: int
+    - x: int
     - y: int
-    - counter : int
-    - pelletsEaten : int
-    - xIncrement : int
-    - yIncrement : int
-    - characterDirection : String
-    - hasPower : boolean
-    + Pacman(int, int) void
-    + getX() int
-    + getY() int
-    + setX(int) void
-    + setY(int) void
-    + setDirection(String) void
-    + isFacingBlock() boolean
-    + respawn() void
-    + colOnMaze() int
-    + rowOnMaze() int
-    + incrementPelletsEaten()  void
-    + numPelletsEaten() int
-    + hasPower() boolean
-    + givePower() void
-    + resetPower() void
-    + move() void
-    + moveRight() void
-    + moveLeft() void
-    + paintCharacter(Graphics) void
-    + moveUp() void
-    + moveDown() void
-}
+    - tileSize: int
+    - image: Image
 
-class Ghost{
-    - GHOST_WIDTH : int
-    - GHOST_HEIGHT : int
-    - x : int
-    - y : int
-    - characterDirection: String
-    + Ghost(int, int)
-    + getX() int
-    + getY() int
-    + setX(int) void
-    + setY(int) void
-    + setDirection(String) void
-    + getDirection() String
-    + isFacingBlock() boolean
-    + isAtIntersection()boolean
-    + reverse() void
-    + respawn() void
-    + paintCharacter(Graphics) void
-}
+    + MazeBlock(int, int, int, int, Image)
 
-class MazeBlock{
-    - BLOCK_WIDTH : int
-    - BLOCK_HEIGHT : int
-    - x : int
-    - y : int
-    + MazeBlock(int, int)
-    + paintBlock(Graphics) void
-}
+    + draw(GraphicsContext) void
 
-class Pellets{
-    - PELLET_WIDTH : int
-    - PELLET_WIDTH : int
-    - x : int
-    - y : int
-    + Pellet(int, int)
-    + paintPellet(Graphics) void
-}
+    + isWall() boolean
+    + isPellet() boolean
+    + isSuperPellet() boolean
 
-class Powerup{
-    + Powerup(int, int)
-    + paintPellet(Graphics) void
-}
-
-class EventRunner{
-    - gameBoard : GameBoard
-    - frameTimer : Timer
-    + EventRunner()
-    + performActions(boolean) void
-    + keyPressed(KeyEvent) void
-    + keyReleased(KeyEvent) void
-    + keyTyped(KeyEvent) void
-    + main(String[]) void
+    + setType(int) void
+    + setImage(Image) void
+    + getType() int
 }
 
 ```
