@@ -1,53 +1,64 @@
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 public class Ghost extends Character {
 
     // Atributos
-    private final int initialX; // Coordenada x inicial do fantasma
-    private final int initialY; // Coordenada y inicial do fantasma
-    private final Image image; // Imagem do fantasma
+    private int initialX; // Coordenada x inicial do fantasma
+    private int initialY; // Coordenada y inicial do fantasma
+    private Image image; // Imagem do fantasma
     private long lastMoveTime; // Tempo do último movimento
+    private double moveInterval = 185_000_000; // Intervalo de meio segundo (em nanossegundos)
+    private double speed = 0.004;
     private boolean isChasing = false; // Indica se o fantasma está perseguindo o Pac-Man
     private boolean isExitingBase = true; // Indica se o fantasma está saindo da base
     private boolean hasExitedBase = false; // Indica se o fantasma já saiu da base
     private static final int CHASE_RANGE = 5; // Distância de perseguição em blocos
     private int lastDirection = -1; // Última direção do movimento
 
-   // Construtor
+    private DoubleProperty translateX;
+    private DoubleProperty translateY;
+
+    // Construtor
     public Ghost(int x, int y, int tileSize, Image image) {
         super(x, y, tileSize);
         this.initialX = x;
         this.initialY = y;
         this.image = image;
         this.lastMoveTime = System.nanoTime(); // Inicializa o tempo do último movimento com o tempo atual
+        this.translateX = new SimpleDoubleProperty(x * tileSize);
+        this.translateY = new SimpleDoubleProperty(y * tileSize);
     }
 
-     // Métodos
+    // Métodos
     public void draw(GraphicsContext gc) {
-        gc.drawImage(image, x * tileSize, y * tileSize, tileSize, tileSize); // Desenha o fantasma na tela
+        gc.drawImage(image, translateX.get(), translateY.get(), tileSize, tileSize); // Desenha o fantasma na tela
     }
 
     @Override
     public void move(int dx, int dy, MazeBlock[][] map) {}
 
     public void move(PacMan pacMan, MazeBlock[][] map, long currentTime) {
-        double moveInterval = 200_000_000; // Intervalo de meio segundo (em nanossegundos)
         if (currentTime - lastMoveTime > moveInterval) { // Verifica se o intervalo de tempo para o próximo movimento já passou
             lastMoveTime = currentTime; // Atualiza o tempo do último movimento
 
             if (isExitingBase) {
                 exitBase(map); // Se o fantasma estiver saindo da base, executa a lógica para sair da base
             } else if (pacMan != null && isWithinChaseRange(pacMan)) {
-                this.isChasing = true; // Se o Pac-Man estiver dentro da distância de perseguição, ativa o modo de perseguição
+                isChasing = true; // Se o Pac-Man estiver dentro da distância de perseguição, ativa o modo de perseguição
                 chasePacMan(pacMan, map); // Executa a lógica de perseguição
             } else {
-                this.isChasing = false; // Caso contrário, desativa o modo de perseguição
+                isChasing = false; // Caso contrário, desativa o modo de perseguição
                 moveRandomly(map); // Executa a lógica de movimento aleatório
             }
         }
@@ -82,6 +93,7 @@ public class Ghost extends Character {
         // Move na direção do Pac-Man em uma das direções possíveis
         if (!possibleMoves.isEmpty()) {
             int[] move = possibleMoves.get(new Random().nextInt(possibleMoves.size())); // Escolhe uma direção aleatória
+            animateMove(x + move[0], y + move[1]);
             x += move[0]; // Atualiza a coordenada x
             y += move[1]; // Atualiza a coordenada y
         }
@@ -89,10 +101,11 @@ public class Ghost extends Character {
 
     private void exitBase(MazeBlock[][] map) {
         if (y > 0 && (map[y - 1][x].getType() == 100 || !map[y - 1][x].isWall())) {
+            animateMove(x, y - 1);
             y--; // Move o fantasma para cima se não houver parede
         } else {
             isExitingBase = false; // Indica que o fantasma saiu da base
-            hasExitedBase = true; // Ingetdica que o fantasma já saiu da base
+            hasExitedBase = true; // Indica que o fantasma já saiu da base
         }
     }
 
@@ -120,15 +133,19 @@ public class Ghost extends Character {
 
             switch (direction) {
                 case 0: // Cima
+                    animateMove(x, y - 1);
                     y--;
                     break;
                 case 1: // Baixo
+                    animateMove(x, y + 1);
                     y++;
                     break;
                 case 2: // Esquerda
+                    animateMove(x - 1, y);
                     x--;
                     break;
                 case 3: // Direita
+                    animateMove(x + 1, y);
                     x++;
                     break;
                 default:
@@ -138,6 +155,19 @@ public class Ghost extends Character {
             // Se não houver direções possíveis, escolhe uma direção aleatória para evitar ficar preso
             lastDirection = -1;
         }
+    }
+
+    // Método para animar o movimento do fantasma
+    private void animateMove(int newX, int newY) {
+        double targetX = newX * tileSize;
+        double targetY = newY * tileSize;
+
+        Timeline timeline = new Timeline();
+        KeyValue kvX = new KeyValue(translateX, targetX);
+        KeyValue kvY = new KeyValue(translateY, targetY);
+        KeyFrame kf = new KeyFrame(Duration.millis(moveInterval / 1_000_000), kvX, kvY);
+        timeline.getKeyFrames().add(kf);
+        timeline.play();
     }
 
     // Getters e Setters
@@ -150,6 +180,6 @@ public class Ghost extends Character {
     }
 
     public void setChasing(boolean chasing) {
-        this.isChasing = chasing; // Define se o fantasma está perseguindo
+        isChasing = chasing; // Define se o fantasma está perseguindo
     }
 }
