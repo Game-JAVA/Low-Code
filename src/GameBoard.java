@@ -14,7 +14,6 @@ import java.util.Objects;
 import javafx.util.Duration;
 import javafx.scene.input.KeyCode;
 import javafx.animation.PauseTransition;
-
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 
@@ -174,7 +173,6 @@ public class GameBoard extends Application {
                         if (!gameOverShown) {
                             gameOverStartTime = System.nanoTime();
                             gameOverShown = true;
-                            //ACREDITO QUE AQUI DEVE ARMAZENAR OS SCORES E PELLETS COLETADOS
                         }
 
                         long elapsedTime = System.nanoTime() - gameOverStartTime;
@@ -404,8 +402,13 @@ public class GameBoard extends Application {
             int ghostY = ghost.getY();
 
             if (pacManX == ghostX && pacManY == ghostY) {
-                // Colisão detectada, jogo acabou
-                isGameOver = true;
+                // Colisão detectada
+                lives--;
+                if (lives>0){
+                    initializeCharacters();
+                }else{
+                    isGameOver = true;
+                }
                 break;
             }
         }
@@ -416,9 +419,9 @@ public class GameBoard extends Application {
         pacMan.collectPellet(map);
         pacMan.collectSuperPellet(map);
         checkCollision();
-    
 
-    if (currentTime - startTime > 5_000_000_000L) { // 5 segundos em nanossegundos
+
+        if (currentTime - startTime > 5_000_000_000L) { // 5 segundos em nanossegundos
             for (Ghost ghost : ghosts) {
                 ghost.setChasing(true);
             }
@@ -468,6 +471,7 @@ public class GameBoard extends Application {
         gameRunning = true;
         isGameOver = false;
         System.out.println("Game Resetado");
+        lives = 3;
         initializeMap();
         initializeCharacters();
         dx = 0;
