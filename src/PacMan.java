@@ -17,11 +17,16 @@ public class PacMan extends Character {
     private final Image Empty = new Image("/assets/maze/0-Empty.png");
     private int score; // Atributo para armazenar o score
 
+    private boolean isHuntingGhosts = false;
+    private long huntStartTime;
+
     private final DoubleProperty translateX;
     private final DoubleProperty translateY;
 
+    private GameBoard gameBoard; // Declarar a variável gameBoard
+
     // Constructor
-    public PacMan(int x, int y, int tileSize, Image image) {
+    public PacMan(int x, int y, int tileSize, Image image, GameBoard gameBoard) {
         super(x, y, tileSize);
         this.image = image;
         this.direction = "Right"; // Direção inicial
@@ -30,6 +35,7 @@ public class PacMan extends Character {
         this.translateX = new SimpleDoubleProperty(x * tileSize);
         this.translateY = new SimpleDoubleProperty(y * tileSize);
         this.score = 0; // Inicializa o score
+        this.gameBoard = gameBoard; // Inicializa a variável gameBoard
     }
 
     // Methods
@@ -65,6 +71,21 @@ public class PacMan extends Character {
             }
 
             if (newX >= 0 && newX < map[0].length && newY >= 0 && newY < map.length && !map[newY][newX].isWall()) {
+                if (map[newY][newX].getType() == 2) {
+                    score += 10;
+                    gameBoard.setScore(score);
+                    map[newY][newX].setImage(Empty);
+                    map[newY][newX].setType(0);
+                } else if (map[newY][newX].getType() == 3) {
+                    score += 50;
+                    gameBoard.setScore(score);
+                    gameBoard.makeGhostsVulnerable();
+                    map[newY][newX].setImage(Empty);
+                    map[newY][newX].setType(0);
+                    isHuntingGhosts = true;
+                    huntStartTime = System.nanoTime();
+                }
+
                 animateMove(newX, newY);
                 x = newX;
                 y = newY;
@@ -100,8 +121,26 @@ public class PacMan extends Character {
             map[y][x].setType(0); // Limpar o superPellet
             map[y][x].setImage(Empty); // Limpar o superPellet
             score += 50; // Adiciona 50 pontos ao score
+            startHuntMode(); // Inicia o modo de caça aos fantasmas
+            makeGhostsVulnerable(); /// falta esse
         }
     }
+
+    private void makeGhostsVulnerable() {
+        for (Ghost ghost : gameBoard.getGhosts()) {
+            ghost.setVulnerable(true);
+        }
+    }
+
+    public boolean isHuntingGhosts() {
+        return isHuntingGhosts;
+    }
+
+    private void startHuntMode() {
+        isHuntingGhosts = true;
+        huntStartTime = System.nanoTime();
+    }
+
 
     // Getters and Setters
 
@@ -119,6 +158,18 @@ public class PacMan extends Character {
 
     public int getScore() {
         return score; // Método para obter o score
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void setHuntingGhosts(boolean huntingGhosts) {
+        isHuntingGhosts = huntingGhosts;
+    }
+
+    public long getHuntStartTime() {
+        return huntStartTime;
     }
 
 }
