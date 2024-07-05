@@ -27,6 +27,7 @@ public class GameBoard extends Application {
     private boolean gameRunning = true;
     private long startTime;
     private int lives = 3;
+    protected int score;
     private final int[][] mazeLayout = {
             { 61,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  62 },
             { 60,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  60 },
@@ -165,6 +166,7 @@ public class GameBoard extends Application {
                         for (Ghost ghost : ghosts) {
                             ghost.move(0, 0, map);
                         }
+                        checkVulnerabilityTimeout(now);
 
                     } else {
                         if (!gameOverShown) {
@@ -194,6 +196,19 @@ public class GameBoard extends Application {
             }
         };
         timer.start();
+    }
+
+    private void checkVulnerabilityTimeout(long currentTime) {
+        long vulnerabilityDuration = 10 * 1_000_000_000L; // 10 segundos em nanossegundos
+        for (Ghost ghost : ghosts) {
+            if (ghost.isVulnerable() && currentTime - ghost.getVulnerableStartTime() > vulnerabilityDuration) {
+                ghost.setVulnerable(false);
+            }
+        }
+    }
+
+    public Ghost[] getGhosts() {
+        return ghosts;
     }
 
     // Incializando as imagens
@@ -294,7 +309,7 @@ public class GameBoard extends Application {
 
     // Inicializando personagens
     private void initializeCharacters() {
-        pacMan = new PacMan(2, 2, TILE_SIZE, pacmanRight);
+        pacMan = new PacMan(2, 2, TILE_SIZE, pacmanRight, this);
         ghosts = new Ghost[] {
                 new Ghost(GameBoard.ghostsLocation(1, mazeLayout)[1], GameBoard.ghostsLocation(1, mazeLayout)[0], TILE_SIZE, staticGhostUp),
                 new Ghost(GameBoard.ghostsLocation(2, mazeLayout)[1], GameBoard.ghostsLocation(2, mazeLayout)[0], TILE_SIZE, staticGhostUp),
@@ -397,10 +412,16 @@ public class GameBoard extends Application {
 
             if (pacManX == ghostX && pacManY == ghostY) {
                 // Colisão detectada
-                lives--;
-                if (lives>0){
+                if (pacMan.isHuntingGhosts()) {
+                    // PacMan está no modo de caça
+                    ghost.resetPosition();
+                    pacMan.setScore(pacMan.getScore() + 200); // Pontuação ao comer um fantasma
+                }
+                // PacMan não está no modo de caça
+                else if (lives> 0) {
                     initializeCharacters();
-                }else{
+                    lives--;
+                } else {
                     isGameOver = true;
                 }
                 break;
@@ -413,6 +434,16 @@ public class GameBoard extends Application {
         pacMan.collectPellet(map);
         pacMan.collectSuperPellet(map);
         checkCollision();
+
+        if (pacMan.isHuntingGhosts()) {
+            long elapsedTime = currentTime - pacMan.getHuntStartTime();
+            if (elapsedTime >= 10_000_000_000L) { // 10 segundos em nanossegundos
+                pacMan.setHuntingGhosts(false); // Fim do modo de caça
+                for (Ghost ghost : ghosts) {
+                    ghost.setVulnerable(false); // Fim da vulnerabilidade dos fantasmas
+                }
+            }
+        }
 
 
     if (currentTime - startTime > 5_000_000_000L) { // 5 segundos em nanossegundos
@@ -470,6 +501,16 @@ public class GameBoard extends Application {
         initializeCharacters();
         dx = 0;
         dy = 0;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void makeGhostsVulnerable() {
+        for (Ghost ghost : ghosts) {
+            ghost.setVulnerable(true);
+        }
     }
 
     public static void main(String[] args) {

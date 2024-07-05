@@ -27,6 +27,10 @@ public class Ghost extends Character {
     private static final int CHASE_RANGE = 10; // Distância de perseguição em blocos
     private int lastDirection = -1; // Última direção do movimento
 
+    private boolean isVulnerable = false;
+    private long vulnerableStartTime;
+
+
     private DoubleProperty translateX;
     private DoubleProperty translateY;
 
@@ -53,7 +57,10 @@ public class Ghost extends Character {
         if (currentTime - lastMoveTime > moveInterval) { // Verifica se o intervalo de tempo para o próximo movimento já passou
             lastMoveTime = currentTime; // Atualiza o tempo do último movimento
 
-            if (isExitingBase) {
+            if (isVulnerable) {
+                // Lógica para fazer o fantasma fugir do Pac-Man
+                fleeFromPacMan(pacMan, map);
+            }else if (isExitingBase) {
                 exitBase(map); // Se o fantasma estiver saindo da base, executa a lógica para sair da base
             } else if (pacMan != null && isWithinChaseRange(pacMan)) {
                 isChasing = true; // Se o Pac-Man estiver dentro da distância de perseguição, ativa o modo de perseguição
@@ -81,6 +88,24 @@ public class Ghost extends Character {
             animateMove(nextMove[0], nextMove[1]);
             x = nextMove[0];
             y = nextMove[1];
+        }
+    }
+
+    private void fleeFromPacMan(PacMan pacMan, MazeBlock[][] map) {
+        int targetX = pacMan.getX();
+        int targetY = pacMan.getY();
+        List<int[]> possibleMoves = new ArrayList<>();
+
+        if (targetX > x && !map[y][x - 1].isWall()) possibleMoves.add(new int[]{-1, 0});
+        if (targetX < x && !map[y][x + 1].isWall()) possibleMoves.add(new int[]{1, 0});
+        if (targetY > y && !map[y - 1][x].isWall()) possibleMoves.add(new int[]{0, -1});
+        if (targetY < y && !map[y + 1][x].isWall()) possibleMoves.add(new int[]{0, 1});
+
+        if (!possibleMoves.isEmpty()) {
+            int[] move = possibleMoves.get(new Random().nextInt(possibleMoves.size()));
+            animateMove(x + move[0], y + move[1]);
+            x += move[0];
+            y += move[1];
         }
     }
 
@@ -195,6 +220,18 @@ public class Ghost extends Character {
         timeline.play();
     }
 
+    public void resetPosition() {
+        x = initialX;
+        y = initialY;
+        isExitingBase = true;
+        hasExitedBase = false;
+        isVulnerable = false; // Reseta o estado de vulnerabilidade
+    }
+
+    public boolean isVulnerable() {
+        return isVulnerable;
+    }
+
     // Getters e Setters
     public int getX() {
         return x; // Retorna a coordenada x
@@ -206,5 +243,16 @@ public class Ghost extends Character {
 
     public void setChasing(boolean chasing) {
         isChasing = chasing; // Define se o fantasma está perseguindo
+    }
+
+    public long getVulnerableStartTime() {
+        return vulnerableStartTime;
+    }
+
+    public void setVulnerable(boolean vulnerable) {
+        isVulnerable = vulnerable;
+        if (vulnerable) {
+            vulnerableStartTime = System.nanoTime();
+        }
     }
 }
