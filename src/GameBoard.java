@@ -10,6 +10,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javafx.util.Duration;
 import javafx.scene.input.KeyCode;
@@ -27,7 +30,8 @@ public class GameBoard extends Application {
     private boolean gameRunning = true;
     private long startTime;
     private int lives = 3;
-    protected int score;
+    private List<int[]> collectedPellets = new ArrayList<>();
+    private  int score;
     private final int[][] mazeLayout = {
             { 61,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  62 },
             { 60,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  60 },
@@ -310,6 +314,7 @@ public class GameBoard extends Application {
     // Inicializando personagens
     private void initializeCharacters() {
         pacMan = new PacMan(2, 2, TILE_SIZE, pacmanRight, this);
+        pacMan.setScore(score);
         ghosts = new Ghost[] {
                 new Ghost(GameBoard.ghostsLocation(1, mazeLayout)[1], GameBoard.ghostsLocation(1, mazeLayout)[0], TILE_SIZE, staticGhostUp),
                 new Ghost(GameBoard.ghostsLocation(2, mazeLayout)[1], GameBoard.ghostsLocation(2, mazeLayout)[0], TILE_SIZE, staticGhostUp),
@@ -400,6 +405,7 @@ public class GameBoard extends Application {
     }
 
     // checkCollision() para verificar colisão entre PacMan e fantasmas
+    // checkCollision() para verificar colisão entre PacMan e fantasmas
     private void checkCollision() {
         // Obter as coordenadas do PacMan
         int pacManX = pacMan.getX();
@@ -416,13 +422,16 @@ public class GameBoard extends Application {
                     // PacMan está no modo de caça
                     ghost.resetPosition();
                     pacMan.setScore(pacMan.getScore() + 200); // Pontuação ao comer um fantasma
-                }
-                // PacMan não está no modo de caça
-                else if (lives> 0) {
-                    initializeCharacters();
-                    lives--;
                 } else {
-                    isGameOver = true;
+                    // PacMan não está no modo de caça
+                    lives--;
+                    if (lives > 0) {
+                        savePelletsState();
+                        score = pacMan.getScore();
+                        initializeCharacters();
+                    } else {
+                        isGameOver = true;
+                    }
                 }
                 break;
             }
@@ -491,12 +500,32 @@ public class GameBoard extends Application {
         // Se o fantasma não for encontrado retorna [-1, -1] como uma posição inválida.
         return new int[]{-1, -1};
     }
+    // Função para salvar o estado dos pellets
+    private void savePelletsState() {
+        collectedPellets.clear();
+        for (int y = 0; y < MAP_HEIGHT; y++) {
+            for (int x = 0; x < MAP_WIDTH; x++) {
+                if (map[y][x].getType() == 0 && map[y][x].getImage() == Pellet) {
+                    collectedPellets.add(new int[]{x, y});
+                }
+            }
+        }
+    }
+
+    // Função para restaurar o estado dos pellets
+    private void restorePelletState() {
+        for (int[] pellet : collectedPellets) {
+            map[pellet[1]][pellet[0]].setImage(Pellet);
+        }
+    }
 
     private void resetGame() {
         gameRunning = true;
         isGameOver = false;
         System.out.println("Game Resetado");
         lives = 3;
+        collectedPellets.clear();
+        score = 0;
         initializeMap();
         initializeCharacters();
         dx = 0;
