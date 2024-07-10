@@ -202,6 +202,7 @@ public class GameBoard extends Application {
         timer.start();
     }
 
+    // Este método verifica se o tempo de vulnerabilidade dos fantasmas expirou
     private void checkVulnerabilityTimeout(long currentTime) {
         long vulnerabilityDuration = 10 * 1_000_000_000L; // 10 segundos em nanossegundos
         for (Ghost ghost : ghosts) {
@@ -211,6 +212,7 @@ public class GameBoard extends Application {
         }
     }
 
+    // Este método retorna o array de fantasmas
     public Ghost[] getGhosts() {
         return ghosts;
     }
@@ -536,6 +538,7 @@ public class GameBoard extends Application {
         this.score = score;
     }
 
+    // Este método torna todos os fantasmas vulneráveis
     public void makeGhostsVulnerable() {
         for (Ghost ghost : ghosts) {
             ghost.setVulnerable(true);
