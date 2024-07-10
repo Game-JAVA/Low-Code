@@ -17,8 +17,8 @@ public class PacMan extends Character {
     private final Image Empty = new Image("/assets/maze/0-Empty.png");
     private int score; // Atributo para armazenar o score
 
-    private boolean isHuntingGhosts = false;
-    private long huntStartTime;
+    private boolean isHuntingGhosts = false; //indica se PacMan está no modo de caça aos fantasmas
+    private long huntStartTime; //armazena o tempo de início do modo de caça aos fantasmas em nanossegundos
 
     private final DoubleProperty translateX;
     private final DoubleProperty translateY;
@@ -122,20 +122,23 @@ public class PacMan extends Character {
             map[y][x].setImage(Empty); // Limpar o superPellet
             score += 50; // Adiciona 50 pontos ao score
             startHuntMode(); // Inicia o modo de caça aos fantasmas
-            makeGhostsVulnerable(); /// falta esse
+            makeGhostsVulnerable(); // Torna todos os fantasmas vulneráveis
         }
     }
 
+    // Este método torna todos os fantasmas vulneráveis
     private void makeGhostsVulnerable() {
         for (Ghost ghost : gameBoard.getGhosts()) {
             ghost.setVulnerable(true);
         }
     }
 
+    // Este método retorna o estado de caça aos fantasmas
     public boolean isHuntingGhosts() {
         return isHuntingGhosts;
     }
 
+    // Este método inicia o modo de caça
     private void startHuntMode() {
         isHuntingGhosts = true;
         huntStartTime = System.nanoTime();
@@ -160,16 +163,19 @@ public class PacMan extends Character {
         return score; // Método para obter o score
     }
 
+    // Este método define a pontuação do jogo
     public void setScore(int score) {
         this.score = score;
     }
 
+    // Este método define se PacMan está no modo de caça aos fantasmas
     public void setHuntingGhosts(boolean huntingGhosts) {
-        isHuntingGhosts = huntingGhosts;
+        isHuntingGhosts = huntingGhosts; // Atribui o valor passado como parâmetro à variável de instância 'isHuntingGhosts'
     }
 
+    // Este método retorna o tempo de início do modo de caça
     public long getHuntStartTime() {
-        return huntStartTime;
+        return huntStartTime;// Retorna o valor da variável de instância 'huntStartTime'
     }
 
 }

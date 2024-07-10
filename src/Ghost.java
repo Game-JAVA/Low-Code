@@ -91,11 +91,15 @@ public class Ghost extends Character {
         }
     }
 
+    // Este método faz os fantasmas fugirem do PacMan
     private void fleeFromPacMan(PacMan pacMan, MazeBlock[][] map) {
         int targetX = pacMan.getX();
         int targetY = pacMan.getY();
+
+        // Cria uma lista para armazenar movimentos possíveis
         List<int[]> possibleMoves = new ArrayList<>();
 
+        // Adiciona movimentos possíveis para longe do PacMan, verificando se não há parede no caminho
         if (targetX > x && !map[y][x - 1].isWall()) possibleMoves.add(new int[]{-1, 0});
         if (targetX < x && !map[y][x + 1].isWall()) possibleMoves.add(new int[]{1, 0});
         if (targetY > y && !map[y - 1][x].isWall()) possibleMoves.add(new int[]{0, -1});
