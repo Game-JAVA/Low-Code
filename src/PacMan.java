@@ -107,6 +107,35 @@ public class PacMan extends Character {
         timeline.play();
     }
 
+    //verifica se um movimento em uma determinada direção é possível
+    public boolean canMoveToDirection(String newDirection, MazeBlock[][] map) {
+        int newX = x;
+        int newY = y;
+
+        switch (newDirection) {
+            case "Left-Up":
+            case "Up":
+            case "Right-Up":
+                newY = y - 1;
+                break;
+            case "Left-Down":
+            case "Down":
+            case "Right-Down":
+                newY = y + 1;
+                break;
+            case "Left":
+                newX = x - 1;
+                break;
+            case "Right":
+                newX = x + 1;
+                break;
+        }
+
+        // Verifica se a nova posição está dentro dos limites do mapa e se não é uma parede
+        return newX >= 0 && newX < map[0].length && newY >= 0 && newY < map.length && !map[newY][newX].isWall();
+    }
+
+
     public void collectPellet(MazeBlock[][] map) {
         if (map[y][x].isPellet()) {
             map[y][x].setType(0); // Limpar o superPellet
@@ -144,6 +173,9 @@ public class PacMan extends Character {
         huntStartTime = System.nanoTime();
     }
 
+    public Image getImage() {
+        return image;
+    }
 
     // Getters and Setters
 
