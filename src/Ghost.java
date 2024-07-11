@@ -20,7 +20,7 @@ public class Ghost extends Character {
     private int initialY; // Coordenada y inicial do fantasma
     private Image image; // Imagem do fantasma
     private long lastMoveTime; // Tempo do último movimento
-    private double moveInterval = 185_000_000; // Intervalo de meio segundo (em nanossegundos)
+    private double moveInterval = 185_000_000; // Intervalo de movimento (em nanossegundos)
     private boolean isChasing = false; // Indica se o fantasma está perseguindo o Pac-Man
     private boolean isExitingBase = true; // Indica se o fantasma está saindo da base
     private boolean hasExitedBase = false; // Indica se o fantasma já saiu da base
@@ -29,7 +29,8 @@ public class Ghost extends Character {
 
     private boolean isVulnerable = false;
     private long vulnerableStartTime;
-
+    private double normalMoveInterval = 185_000_000; // Intervalo de movimento normal
+    private double vulnerableMoveInterval = 400_000_000; // Intervalo de movimento quando vulnerável
 
     private DoubleProperty translateX;
     private DoubleProperty translateY;
@@ -60,7 +61,7 @@ public class Ghost extends Character {
             if (isVulnerable) {
                 // Lógica para fazer o fantasma fugir do Pac-Man
                 fleeFromPacMan(pacMan, map);
-            }else if (isExitingBase) {
+            } else if (isExitingBase) {
                 exitBase(map); // Se o fantasma estiver saindo da base, executa a lógica para sair da base
             } else if (pacMan != null && isWithinChaseRange(pacMan)) {
                 isChasing = true; // Se o Pac-Man estiver dentro da distância de perseguição, ativa o modo de perseguição
@@ -100,17 +101,34 @@ public class Ghost extends Character {
         List<int[]> possibleMoves = new ArrayList<>();
 
         // Adiciona movimentos possíveis para longe do PacMan, verificando se não há parede no caminho
-        if (targetX > x && !map[y][x - 1].isWall()) possibleMoves.add(new int[]{-1, 0});
-        if (targetX < x && !map[y][x + 1].isWall()) possibleMoves.add(new int[]{1, 0});
-        if (targetY > y && !map[y - 1][x].isWall()) possibleMoves.add(new int[]{0, -1});
-        if (targetY < y && !map[y + 1][x].isWall()) possibleMoves.add(new int[]{0, 1});
+        if (targetX > x && !map[y][x - 1].isWall()) possibleMoves.add(new int[]{x - 1, y});
+        if (targetX < x && !map[y][x + 1].isWall()) possibleMoves.add(new int[]{x + 1, y});
+        if (targetY > y && !map[y - 1][x].isWall()) possibleMoves.add(new int[]{x, y - 1});
+        if (targetY < y && !map[y + 1][x].isWall()) possibleMoves.add(new int[]{x, y + 1});
 
         if (!possibleMoves.isEmpty()) {
-            int[] move = possibleMoves.get(new Random().nextInt(possibleMoves.size()));
-            animateMove(x + move[0], y + move[1]);
-            x += move[0];
-            y += move[1];
+            // Escolhe o movimento que maximiza a distância do Pac-Man
+            int[] bestMove = possibleMoves.get(0);
+            double maxDistance = distance(bestMove[0], bestMove[1], targetX, targetY);
+
+            for (int[] move : possibleMoves) {
+                double dist = distance(move[0], move[1], targetX, targetY);
+                if (dist > maxDistance) {
+                    bestMove = move;
+                    maxDistance = dist;
+                }
+            }
+
+            animateMove(bestMove[0], bestMove[1]);
+            x = bestMove[0];
+            y = bestMove[1];
+        } else {
+            moveRandomly(map); // Se não houver movimentos válidos, se move aleatoriamente
         }
+    }
+
+    private double distance(int x1, int y1, int x2, int y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
     private List<int[]> findPath(int startX, int startY, int targetX, int targetY, MazeBlock[][] map) {
@@ -230,6 +248,7 @@ public class Ghost extends Character {
         isExitingBase = true;
         hasExitedBase = false;
         isVulnerable = false; // Reseta o estado de vulnerabilidade
+        moveInterval = normalMoveInterval; // Reseta a velocidade de movimento
     }
 
     public boolean isVulnerable() {
@@ -256,7 +275,10 @@ public class Ghost extends Character {
     public void setVulnerable(boolean vulnerable) {
         isVulnerable = vulnerable;
         if (vulnerable) {
+            moveInterval = vulnerableMoveInterval; // Diminui a velocidade de movimento
             vulnerableStartTime = System.nanoTime();
+        } else {
+            moveInterval = normalMoveInterval; // Restaura a velocidade de movimento
         }
     }
 }
