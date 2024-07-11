@@ -349,6 +349,8 @@ public class GameBoard extends Application {
             return;
         }
 
+        String newDirection = pacMan.getDirection();
+        Image newImage = pacMan.getImage();
 
         switch (event.getCode()) {
             case W:
@@ -357,13 +359,12 @@ public class GameBoard extends Application {
                 dy = -1;
 
                 if (pacMan.getDirection().equals("Right") || pacMan.getDirection().equals("Left-Down")) {
-                    pacMan.setImage(pacmanRightUp);
-                    pacMan.setDirection("Right-Up");
+                    newImage = pacmanRightUp;
+                    newDirection = "Right-Up";
                 } else if (pacMan.getDirection().equals("Left") || pacMan.getDirection().equals("Right-Down")) {
-                    pacMan.setImage(pacmanLeftUp);
-                    pacMan.setDirection("Left-Up");
+                    newImage = pacmanLeftUp;
+                    newDirection = "Left-Up";
                 }
-
                 break;
             case S:
             case DOWN:
@@ -371,30 +372,35 @@ public class GameBoard extends Application {
                 dy = 1;
 
                 if (pacMan.getDirection().equals("Right") || pacMan.getDirection().equals("Left-Up")) {
-                    pacMan.setImage(pacmanRightDown);
-                    pacMan.setDirection("Right-Down");
+                    newImage = pacmanRightDown;
+                    newDirection = "Right-Down";
                 } else if (pacMan.getDirection().equals("Left") || pacMan.getDirection().equals("Right-Up")) {
-                    pacMan.setImage(pacmanLeftDown);
-                    pacMan.setDirection("Left-Down");
+                    newImage = pacmanLeftDown;
+                    newDirection = "Left-Down";
                 }
-
                 break;
             case A:
             case LEFT:
                 dx = -1;
                 dy = 0;
-                pacMan.setImage(pacmanLeft);
-                pacMan.setDirection("Left");
+                newImage = pacmanLeft;
+                newDirection = "Left";
                 break;
             case D:
             case RIGHT:
                 dx = 1;
                 dy = 0;
-                pacMan.setImage(pacmanRight);
-                pacMan.setDirection("Right");
+                newImage = pacmanRight;
+                newDirection = "Right";
                 break;
             default:
                 break;
+        }
+
+        // Verifica se PacMan pode se mover na nova direção antes de atualizá-la
+        if (pacMan.canMoveToDirection(newDirection, map)) {
+            pacMan.setImage(newImage);
+            pacMan.setDirection(newDirection);
         }
     }
 
@@ -457,7 +463,7 @@ public class GameBoard extends Application {
         }
 
 
-    if (currentTime - startTime > 5_000_000_000L) { // 5 segundos em nanossegundos
+        if (currentTime - startTime > 5_000_000_000L) { // 5 segundos em nanossegundos
             for (Ghost ghost : ghosts) {
                 ghost.setChasing(true);
             }
