@@ -34,6 +34,8 @@ public class GameBoard extends Application {
     private List<int[]> collectedPellets = new ArrayList<>();
     private  int score;
     private GraphicsContext gc;
+
+    private boolean endGameShown = false;
     private final int[][] mazeLayout = {
             { 61,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  62 },
             { 60,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  54,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  41,  53,  60 },
@@ -83,7 +85,10 @@ public class GameBoard extends Application {
     private Image pacmanLeft;
     private Image pacmanLeftDown;
 
-    private Image staticGhostUp;
+    private Image redGhostRight, redGhostLeft, redGhostUp, redGhostDown;
+    private Image pinkGhostRight, pinkGhostLeft, pinkGhostUp, pinkGhostDown;
+    private Image blueGhostRight, blueGhostLeft, blueGhostUp, blueGhostDown;
+    private Image orangeGhostRight, orangeGhostLeft, orangeGhostUp, orangeGhostDown;
 
     private Image Empty;
     private Image Pellet;
@@ -179,12 +184,12 @@ public class GameBoard extends Application {
                         if (!gameOverShown) {
                             gameOverStartTime = System.nanoTime();
                             gameOverShown = true;
-                            showEndGameScreen(gc);
+                            showEndGameScreen();
                         }
 
 
                         long elapsedTime = System.nanoTime() - gameOverStartTime;
-                        double secondsToShowGameOver = 1.1; // Tempo desejado em segundos
+                        double secondsToShowGameOver = 0.3; // Tempo desejado em segundos
                         if (elapsedTime >= secondsToShowGameOver * 1e9) {
                             // Reduz a imagem de Game Over após o tempo desejado
                             gc.drawImage(gameOverImage, (canvas.getWidth() - gameOverImage.getWidth() / 2) / 2,
@@ -230,7 +235,25 @@ public class GameBoard extends Application {
         pacmanLeft = new Image("/assets/pacman-Left.gif");
         pacmanLeftDown = new Image("/assets/pacman-Left-Down.gif");
 
-        staticGhostUp = new Image("/assets/staticGhostUp.gif");
+        orangeGhostRight = new Image("/assets/orangeGhostRight.gif");
+        orangeGhostLeft = new Image("/assets/orangeGhostLeft.gif");
+        orangeGhostUp = new Image("/assets/orangeGhostUp.gif");
+        orangeGhostDown = new Image("/assets/orangeGhostDown.gif");
+
+        redGhostRight = new Image("/assets/redGhostRight.gif");
+        redGhostLeft = new Image("/assets/redGhostLeft.gif");
+        redGhostUp = new Image("/assets/redGhostUp.gif");
+        redGhostDown = new Image("/assets/redGhostDown.gif");
+
+        pinkGhostRight = new Image("/assets/pinkGhostRight.gif");
+        pinkGhostLeft = new Image("/assets/pinkGhostLeft.gif");
+        pinkGhostUp = new Image("/assets/pinkGhostUp.gif");
+        pinkGhostDown = new Image("/assets/pinkGhostDown.gif");
+
+        blueGhostRight = new Image("/assets/blueGhostRight.gif");
+        blueGhostLeft = new Image("/assets/blueGhostLeft.gif");
+        blueGhostUp = new Image("/assets/blueGhostUp.gif");
+        blueGhostDown = new Image("/assets/blueGhostDown.gif");
 
         lifeImage = new Image("/assets/heart.png"); // Nova imagem para vida
         gameOverImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/game-over.png")));
@@ -324,10 +347,10 @@ public class GameBoard extends Application {
         pacMan = new PacMan(2, 2, TILE_SIZE, pacmanRight, this);
         pacMan.setScore(score);
         ghosts = new Ghost[] {
-                //new Ghost(GameBoard.ghostsLocation(1, mazeLayout)[1], GameBoard.ghostsLocation(1, mazeLayout)[0], TILE_SIZE, staticGhostUp),
-                //new Ghost(GameBoard.ghostsLocation(2, mazeLayout)[1], GameBoard.ghostsLocation(2, mazeLayout)[0], TILE_SIZE, staticGhostUp),
-                //new Ghost(GameBoard.ghostsLocation(3, mazeLayout)[1], GameBoard.ghostsLocation(3, mazeLayout)[0], TILE_SIZE, staticGhostUp),
-                //new Ghost(GameBoard.ghostsLocation(4, mazeLayout)[1], GameBoard.ghostsLocation(4, mazeLayout)[0], TILE_SIZE, staticGhostUp)
+                new Ghost(GameBoard.ghostsLocation(1, mazeLayout)[1], GameBoard.ghostsLocation(1, mazeLayout)[0], TILE_SIZE, redGhostRight, redGhostLeft, redGhostUp, redGhostDown),
+                new Ghost(GameBoard.ghostsLocation(2, mazeLayout)[1], GameBoard.ghostsLocation(2, mazeLayout)[0], TILE_SIZE, pinkGhostRight, pinkGhostLeft, pinkGhostUp, pinkGhostDown),
+                new Ghost(GameBoard.ghostsLocation(3, mazeLayout)[1], GameBoard.ghostsLocation(3, mazeLayout)[0], TILE_SIZE, blueGhostRight, blueGhostLeft, blueGhostUp, blueGhostDown),
+                new Ghost(GameBoard.ghostsLocation(4, mazeLayout)[1], GameBoard.ghostsLocation(4, mazeLayout)[0], TILE_SIZE, orangeGhostRight, orangeGhostLeft, orangeGhostUp, orangeGhostDown)
         };
     }
 
@@ -483,7 +506,7 @@ public class GameBoard extends Application {
         if (areAllPelletsCollected()) {
             isGameOver = true;
             gameRunning = false;
-            showEndGameScreen(gc);
+            showEndGameScreen();
         }
     }
 
@@ -545,33 +568,16 @@ public class GameBoard extends Application {
         return true;
     }
 
-    private void showEndGameScreen(GraphicsContext gc) {
+    private void showEndGameScreen() {
         gc.clearRect(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE); // Limpa o canvas
         gc.drawImage(endgameImage, (MAP_WIDTH * TILE_SIZE - endgameImage.getWidth()) / 2,
                 (MAP_HEIGHT * TILE_SIZE - endgameImage.getHeight()) / 2);
 
-        // Desenha o score final
         gc.setFill(Color.YELLOW);
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 40));
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 30));
         gc.fillText("Final Score: " + pacMan.getScore(),
                 (MAP_WIDTH * TILE_SIZE - 200) / 2,
                 (MAP_HEIGHT * TILE_SIZE + endgameImage.getHeight()) / 2 + 40);
-
-        // Configura o texto "Press SPACE for restart"
-        Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(0.5), event -> {
-            gc.clearRect(0, 0, MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE); // Limpa o canvas novamente
-            gc.drawImage(endgameImage, (MAP_WIDTH * TILE_SIZE - endgameImage.getWidth()) / 2,
-                    (MAP_HEIGHT * TILE_SIZE - endgameImage.getHeight()) / 2);
-
-            // Desenha o texto piscante em branco
-            gc.setFill(Color.WHITE);
-            gc.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-            gc.fillText("Press SPACE for restart",
-                    (MAP_WIDTH * TILE_SIZE - 200) / 2,
-                    (MAP_HEIGHT * TILE_SIZE + endgameImage.getHeight()) / 2 + 80);
-        }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
     }
 
 
