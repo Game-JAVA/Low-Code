@@ -32,15 +32,25 @@ public class Ghost extends Character {
     private double normalMoveInterval = 185_000_000; // Intervalo de movimento normal
     private double vulnerableMoveInterval = 400_000_000; // Intervalo de movimento quando vulnerável
 
+    private Image imageRight;
+    private Image imageLeft;
+    private Image imageUp;
+    private Image imageDown;
+    private Image currentImage;
+
     private DoubleProperty translateX;
     private DoubleProperty translateY;
 
     // Construtor
-    public Ghost(int x, int y, int tileSize, Image image) {
+    public Ghost(int x, int y, int tileSize, Image imageRight, Image imageLeft, Image imageUp, Image imageDown) {
         super(x, y, tileSize);
         this.initialX = x;
         this.initialY = y;
-        this.image = image;
+        this.imageRight = imageRight;
+        this.imageLeft = imageLeft;
+        this.imageUp = imageUp;
+        this.imageDown = imageDown;
+        this.currentImage = imageRight; // Direção inicial
         this.lastMoveTime = System.nanoTime(); // Inicializa o tempo do último movimento com o tempo atual
         this.translateX = new SimpleDoubleProperty(x * tileSize);
         this.translateY = new SimpleDoubleProperty(y * tileSize);
@@ -48,7 +58,7 @@ public class Ghost extends Character {
 
     // Métodos
     public void draw(GraphicsContext gc) {
-        gc.drawImage(image, translateX.get(), translateY.get(), tileSize, tileSize); // Desenha o fantasma na tela
+        gc.drawImage(currentImage, translateX.get(), translateY.get(), tileSize, tileSize); // Desenha o fantasma na tela
     }
 
     @Override
